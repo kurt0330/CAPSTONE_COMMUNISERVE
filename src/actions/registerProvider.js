@@ -4,7 +4,7 @@
 
 'use server';
 
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 
 const ALLOWED_TRADES = ['Carpenter', 'Electrician', 'Kasambahay'];
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -31,7 +31,10 @@ async function uploadFile(supabase, file, bucket, folder) {
 
 // ── Main Server Action ─────────────────────────────────────────────
 export async function registerProvider(formData) {
-  const supabase = createServerClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
   // ── 1. Extract all fields (mirrors register_sp.php section 3) ──
 

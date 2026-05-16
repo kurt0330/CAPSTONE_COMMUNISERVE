@@ -1,12 +1,25 @@
 // PATH: /src/lib/supabase/server.js
-// Server-side client — used in Server Actions, API Routes, Server Components
-// Uses service role key to BYPASS RLS when needed (admin operations)
-
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { createServerClient as createSupabaseServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 export function createServerClient() {
-  return createSupabaseClient(
+  const cookieStore = cookies();
+
+  return createSupabaseServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name, value, options) {
+          try { cookieStore.set({ name, value, ...options }); } catch {}
+        },
+        remove(name, options) {
+          try { cookieStore.set({ name, value: '', ...options }); } catch {}
+        },
+      },
+    }
   );
 }

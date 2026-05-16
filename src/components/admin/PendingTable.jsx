@@ -31,7 +31,9 @@ export default function PendingTable({ onStatsChange }) {
     }
   }, [onStatsChange]);
 
-  useEffect(() => { fetchPending(); }, [fetchPending]);
+  useEffect(() => { 
+    fetchPending(); 
+  }, []);
 
   // ── Approve / Reject ─────────────────────────────────────────────────
   async function handleAction(providerId, action) {

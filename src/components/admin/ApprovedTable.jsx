@@ -28,7 +28,9 @@ export default function ApprovedTable({ onStatsChange }) {
     }
   }, [onStatsChange]);
 
-  useEffect(() => { fetchApproved(); }, [fetchApproved]);
+  useEffect(() => { 
+    fetchApproved(); 
+  }, []);
 
   const filtered = providers.filter((sp) => {
     const nameMatch  = sp.full_name?.toLowerCase().includes(search.toLowerCase());
