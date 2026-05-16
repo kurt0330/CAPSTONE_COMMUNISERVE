@@ -1,0 +1,547 @@
+/* ================================================================
+   sp_steps.css  —  CommuniServe SP Registration Additive Styles
+   ----------------------------------------------------------------
+   RULE: This file ONLY adds new selectors.
+         It NEVER redefines anything already in global.css or form.css.
+         All existing classes (.main-header, .page-container,
+         .section-header, .input-row, .label-name, .table-input,
+         .nav-btn, .segmented-bar etc.) stay untouched.
+   ================================================================ */
+
+/* ── Shared token (mirrors existing #0504AA in form.css) ── */
+:root {
+    --sp-blue:       #0504AA;
+    --sp-blue-mid:   #3B3BC9;
+    --sp-blue-tint:  #EEEEFF;
+    --sp-teal:       #1D9E75;
+    --sp-teal-tint:  #E1F5EE;
+    --sp-amber:      #EF9F27;
+    --sp-red:        #E24B4A;
+    --sp-border:     #E2E4EC;
+    --sp-bg-subtle:  #F8F9FC;
+    --sp-radius:     10px;
+    --sp-speed:      0.22s;
+}
+
+/* ════════════════════════════════════════════════════════════
+   STEP PANEL SYSTEM
+   All 5 page-containers live in the DOM.
+   JS sets display:block on the active one.
+   The .step-panel class adds the fade-in animation only.
+════════════════════════════════════════════════════════════ */
+.step-panel {
+    animation: spStepIn 0.30s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes spStepIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Progress bar: completed-step tint (new state, not in form.css) ── */
+.nav-btn.done {
+    background-color: var(--sp-teal) !important;
+    color: #fff !important;
+}
+
+/* ── Required asterisk ── */
+.req {
+    color: var(--sp-red);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* ════════════════════════════════════════════════════════════
+   SELECT — keeps the underline-only style of .table-input
+════════════════════════════════════════════════════════════ */
+.select-styled {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%230504AA'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px center;
+    padding-right: 20px;
+    cursor: pointer;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TEXTAREA
+════════════════════════════════════════════════════════════ */
+.textarea-styled {
+    resize: vertical;
+    min-height: 90px;
+    border: 1px solid var(--sp-border) !important;
+    border-radius: var(--sp-radius) !important;
+    padding: 10px 12px !important;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #111;
+    line-height: 1.55;
+    transition: border-color var(--sp-speed), box-shadow var(--sp-speed);
+}
+.textarea-styled:focus {
+    border-color: var(--sp-blue) !important;
+    box-shadow: 0 0 0 3px var(--sp-blue-tint);
+    outline: none;
+}
+
+/* ════════════════════════════════════════════════════════════
+   STEP 1 — SOCIO-ECONOMIC CARDS
+════════════════════════════════════════════════════════════ */
+.socio-note {
+    font-size: 13px;
+    color: #888;
+    margin: -10px 0 16px;
+    font-family: Arial, sans-serif;
+}
+
+.socio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.socio-card {
+    display: block;
+    cursor: pointer;
+    border-radius: var(--sp-radius);
+    border: 1.5px solid var(--sp-border);
+    background: #fff;
+    overflow: hidden;
+    transition: border-color var(--sp-speed), box-shadow var(--sp-speed), transform var(--sp-speed);
+    user-select: none;
+}
+.socio-card:hover {
+    border-color: var(--sp-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(5,4,170,0.10);
+}
+
+/* Hide the actual checkbox — the card IS the click target */
+.socio-card input[type="checkbox"] { display: none; }
+
+/* Checked state: blue top border + tinted background */
+.socio-card input[type="checkbox"]:checked ~ .socio-body {
+    background: var(--sp-blue-tint);
+    border-top: 3px solid var(--sp-blue);
+}
+
+.socio-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 14px 16px;
+    border-top: 3px solid transparent;
+    transition: background var(--sp-speed);
+}
+.socio-icon  { font-size: 20px; margin-bottom: 2px; }
+.socio-body strong { font-size: 13px; font-weight: 700; color: #111; }
+.socio-body small  { font-size: 11px; color: #888; line-height: 1.4; }
+
+/* ════════════════════════════════════════════════════════════
+   STEP 2 — EMPLOYMENT SUB-PANELS
+════════════════════════════════════════════════════════════ */
+.sub-panel {
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: var(--sp-bg-subtle);
+    border-left: 3px solid var(--sp-blue);
+    border-radius: 0 var(--sp-radius) var(--sp-radius) 0;
+    animation: spStepIn 0.2s ease both;
+}
+.sub-panel-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--sp-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   STEP 3 — TRADE SELECTION CARDS
+════════════════════════════════════════════════════════════ */
+.step-intro-text {
+    font-size: 13px;
+    color: #888;
+    margin: -10px 0 20px;
+    line-height: 1.6;
+    font-family: Arial, sans-serif;
+}
+
+.trade-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.trade-card {
+    display: block;
+    cursor: pointer;
+    border-radius: var(--sp-radius);
+    border: 2px solid var(--sp-border);
+    background: #fff;
+    overflow: hidden;
+    transition: border-color var(--sp-speed), box-shadow var(--sp-speed), transform var(--sp-speed);
+    position: relative;
+}
+.trade-card:hover {
+    border-color: var(--sp-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(5,4,170,0.13);
+}
+
+/* Hide radio — card is the click target */
+.trade-card input[type="radio"] { display: none; }
+
+/* Selected state */
+.trade-card input[type="radio"]:checked ~ .trade-face {
+    border-top: 4px solid var(--sp-blue);
+    background: var(--sp-blue-tint);
+}
+.trade-card input[type="radio"]:checked ~ .trade-face .trade-badge {
+    display: inline-flex;
+}
+
+.trade-face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 28px 18px 20px;
+    border-top: 4px solid transparent;
+    gap: 5px;
+    transition: background var(--sp-speed), border-color var(--sp-speed);
+}
+.trade-emoji { font-size: 44px; margin-bottom: 4px; }
+.trade-name  { font-size: 17px; font-weight: 700; color: #111; }
+.trade-local { font-size: 12px; color: #888; font-style: italic; }
+.trade-desc  { font-size: 12px; color: #777; line-height: 1.5; margin-top: 4px; }
+
+.trade-badge {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    background: var(--sp-blue);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 40px;
+    margin-top: 10px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   STEP 4 — ASSESSMENT PLACEHOLDER
+════════════════════════════════════════════════════════════ */
+.assessment-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 36px 20px 32px;
+}
+.assessment-icon  { font-size: 56px; margin-bottom: 14px; }
+.assessment-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 14px;
+    font-family: Arial, sans-serif;
+}
+.assessment-body {
+    font-size: 14px;
+    color: #666;
+    max-width: 520px;
+    line-height: 1.65;
+    margin: 0 0 28px;
+    font-family: Arial, sans-serif;
+}
+
+.assessment-info-strip {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 28px;
+    width: 100%;
+    max-width: 560px;
+}
+.ainfo-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--sp-bg-subtle);
+    border: 1px solid var(--sp-border);
+    border-radius: var(--sp-radius);
+    padding: 12px 14px;
+    text-align: left;
+    flex: 1;
+    min-width: 160px;
+}
+.ainfo-icon { font-size: 20px; flex-shrink: 0; }
+.ainfo-item strong { display: block; font-size: 12px; font-weight: 700; color: #111; }
+.ainfo-item small  { font-size: 11px; color: #888; }
+
+.btn-start-test {
+    background: var(--sp-blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--sp-radius);
+    padding: 13px 36px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: background var(--sp-speed), transform var(--sp-speed), box-shadow var(--sp-speed);
+}
+.btn-start-test:hover {
+    background: var(--sp-blue-mid);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(5,4,170,0.25);
+}
+
+/* ════════════════════════════════════════════════════════════
+   STEP 5 — FILE UPLOAD
+════════════════════════════════════════════════════════════ */
+.upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.upload-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 7px;
+    border: 2px dashed var(--sp-border);
+    border-radius: var(--sp-radius);
+    background: var(--sp-bg-subtle);
+    padding: 24px 16px;
+    transition: border-color var(--sp-speed), background var(--sp-speed);
+}
+.upload-zone:hover {
+    border-color: var(--sp-blue);
+    background: var(--sp-blue-tint);
+}
+.upload-zone.file-ok { border-color: var(--sp-teal); background: var(--sp-teal-tint); }
+
+.upload-zone-icon  { font-size: 30px; }
+.upload-zone-title { font-size: 14px; font-weight: 700; color: #111; margin: 0; }
+.upload-zone-hint  { font-size: 12px; color: #888; margin: 0; }
+
+.btn-file-choose {
+    display: inline-block;
+    background: var(--sp-blue);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    transition: background var(--sp-speed);
+    margin-top: 4px;
+}
+.btn-file-choose:hover { background: var(--sp-blue-mid); }
+
+.upload-prev-name {
+    font-size: 12px;
+    color: var(--sp-teal);
+    font-weight: 600;
+    word-break: break-all;
+    min-height: 16px;
+    margin: 0;
+}
+
+/* Terms block */
+.terms-block {
+    background: var(--sp-bg-subtle);
+    border: 1px solid var(--sp-border);
+    border-radius: var(--sp-radius);
+    padding: 14px 16px;
+    margin-bottom: 24px;
+}
+.terms-check-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: #333;
+    line-height: 1.55;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+}
+.terms-check-label input[type="checkbox"] {
+    accent-color: var(--sp-blue);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+/* Submit button */
+.btn-submit {
+    background: var(--sp-teal);
+    color: #fff;
+    border: none;
+    border-radius: var(--sp-radius);
+    padding: 13px 32px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: background var(--sp-speed), transform var(--sp-speed), box-shadow var(--sp-speed);
+}
+.btn-submit:hover {
+    background: #178A65;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(29,158,117,0.28);
+}
+
+/* Success state */
+.submit-success {
+    text-align: center;
+    padding: 40px 20px;
+    animation: spStepIn 0.4s ease both;
+    font-family: Arial, sans-serif;
+}
+.success-circle {
+    width: 72px;
+    height: 72px;
+    background: var(--sp-teal-tint);
+    color: var(--sp-teal);
+    border-radius: 50%;
+    font-size: 30px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+.submit-success h2 { font-size: 22px; font-weight: 700; margin: 0 0 12px; }
+.submit-success p  { font-size: 14px; color: #777; max-width: 420px; margin: 0 auto; line-height: 1.65; }
+
+/* ════════════════════════════════════════════════════════════
+   NAV ROW BUTTONS (Next / Back)
+   New classes — not in form.css, so no conflict
+════════════════════════════════════════════════════════════ */
+.nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 28px;
+    margin-top: 16px;
+    border-top: 1px solid #EAEBEF;
+}
+
+.btn-next {
+    background: var(--sp-blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--sp-radius);
+    padding: 12px 26px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: background var(--sp-speed), transform var(--sp-speed), box-shadow var(--sp-speed);
+}
+.btn-next:hover {
+    background: var(--sp-blue-mid);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(5,4,170,0.22);
+}
+.btn-next:active { transform: translateY(0); }
+
+.btn-back {
+    background: #EBEBEB;
+    color: #444;
+    border: none;
+    border-radius: var(--sp-radius);
+    padding: 12px 22px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--sp-speed);
+}
+.btn-back:hover { background: #DCDCDC; }
+
+/* ════════════════════════════════════════════════════════════
+   VALIDATION — highlight missing required fields
+════════════════════════════════════════════════════════════ */
+.field-invalid {
+    border-bottom-color: var(--sp-red) !important;
+}
+.select-invalid {
+    border-bottom-color: var(--sp-red) !important;
+    color: var(--sp-red);
+}
+
+/* Toast error notification */
+.sp-toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--sp-red);
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.20);
+    z-index: 9999;
+    animation: spStepIn 0.2s ease both;
+    white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+    .trade-grid { grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+}
+
+@media (max-width: 768px) {
+    /* Page container matches form.css mobile behaviour */
+    .page-container { width: 100%; padding: 28px 16px; }
+
+    /* Progress bar: allow horizontal scroll on narrow screens */
+    .step-progress-wrapper { width: 100%; overflow-x: auto; padding-bottom: 4px; }
+    .segmented-bar          { min-width: 480px; }
+
+    /* Stack .input-row columns */
+    .input-row      { flex-direction: column; gap: 16px; }
+    .input-container{ flex-direction: column; gap: 16px; }
+
+    /* Cards go single column */
+    .socio-grid  { grid-template-columns: 1fr 1fr; }
+    .trade-grid  { grid-template-columns: 1fr; }
+    .upload-grid { grid-template-columns: 1fr; }
+
+    .assessment-info-strip { flex-direction: column; }
+    .ainfo-item { min-width: unset; }
+
+    /* Nav row stacks on mobile */
+    .nav-row {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+    .btn-next,
+    .btn-back,
+    .btn-submit { width: 100%; text-align: center; }
+}
+
+@media (max-width: 480px) {
+    .socio-grid { grid-template-columns: 1fr; }
+    .page-background { padding: 110px 0 40px; }
+}

@@ -1,0 +1,234 @@
+.page-background {
+    padding: 150px 50px 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    min-height: 100vh;
+}
+
+.page-container {
+    background-color: white;
+    width: 850px;
+    min-height: 1056px;
+    padding: 1in; 
+    padding-top: 50px;
+    padding-bottom: 50px;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    z-index: 5;
+}
+
+.form-logo {
+    height: auto; 
+    width: 100px;
+    display: block;
+    margin: 0 auto 10px auto;
+}
+
+.cell-nsrp {
+    text-align: right;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.cell-header {
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.4;
+    margin-bottom: 30px;
+}
+
+.form-instructions {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    margin-bottom: 25px;
+    text-align: justify;
+}
+
+.section-header {
+    background-color: #D9E5F0;
+    padding: 5px 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: black;
+}
+
+.input-container {
+    display: flex;
+    gap: 40px; 
+}
+
+.side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.label-name {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 2px;
+    color: #333;
+}
+
+.table-input {
+    border: none;
+    border-bottom: 1px solid black; 
+    padding: 2px;
+    font-size: 16px;
+    width: 100%;
+
+    outline: none;
+    background: transparent;
+    border-radius: 0;
+}
+
+.table-input:focus {
+    border-bottom: 2px solid #0056b3;
+    outline: none;
+}
+
+.input-row {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+.checkbox-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    font-size: 14px;
+    margin-top: 5px;
+}
+ 
+.grid-checkbox {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.grid-checkbox-1line{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.grid-checkbox-tab {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    margin-top:10px; 
+    font-size: 11px;
+    padding-left: 20px;
+}
+
+small {
+    font-size: 10px;
+    font-weight: normal;
+    color: #666;
+}
+
+.field-group input.table-input {
+    margin-bottom: 5px;
+    outline: none;
+}
+
+
+.step-progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 10;
+    width: 850px;
+}
+
+/* Ang cirlce nga may 1 */
+.main-circle {
+    width: 70px;
+    height: 70px;
+    background-color: #0504AA;
+    font-weight: bold;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: bold;
+    border: none;
+    flex-shrink: 0;
+    z-index: 11;
+
+    margin-right: -25px;;
+}
+
+/* Ang partition sa daw capsule shape HAHA */
+.segmented-bar {
+    display: flex;
+    flex-grow: 1;
+    height: 45px;
+    background-color: white;
+    border: 2px solid #0504AA;
+    border-radius: 0 25px 25px 0;
+    border-left: none;
+    overflow: hidden;
+}
+
+/* The Buttons (Partitions) */
+.nav-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-right: 1px solid #0504AA;
+    color: #0504AA;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    outline: none;
+}
+
+.nav-btn:last-child {
+    border-right: none;
+}
+
+.nav-btn.active {
+    background-color: #0504AA;
+    color: white;
+    z-index: 5;
+    padding-right: 15px; 
+}
+
+.nav-btn:not(.active):hover {
+    background-color: #e6e6ff;
+}
+
+@media print {
+    .page-background { background: none; padding: 0; }
+    .page-container { box-shadow: none; border: none; width: 100%; padding: 0.5in; }
+    .main-header { display: none; }
+}

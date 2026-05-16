@@ -1,0 +1,51 @@
+/* PATH: /src/styles/globals.css
+   Replaces: SP/css/global.css
+   Note: Import this in /src/app/layout.js                        */
+
+body {
+  background-color: white;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: black;
+  margin: 0;
+}
+
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #0504AA;
+  padding: 30px 10px;
+  text-align: left;
+  border-bottom: 2px solid #f0f0f0;
+  z-index: 1000;
+}
+
+.web-title {
+  margin: 1.5px;
+  font-size: 35px;
+  color: white;
+  letter-spacing: 1.5px;
+  font-family: Arial, sans-serif;
+}
+
+/* CSS custom properties — mirrors sp_steps.css :root block */
+:root {
+  --sp-blue:      #0504AA;
+  --sp-blue-mid:  #3B3BC9;
+  --sp-blue-tint: #EEEEFF;
+  --sp-teal:      #1D9E75;
+  --sp-teal-tint: #E1F5EE;
+  --sp-amber:     #EF9F27;
+  --sp-red:       #E24B4A;
+  --sp-border:    #E2E4EC;
+  --sp-bg-subtle: #F8F9FC;
+  --sp-radius:    10px;
+  --sp-speed:     0.22s;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
