@@ -1,4 +1,4 @@
-// PATH: /src/app/page.js
+// PATH: /src/app/register/provider/page.js
 // Role: Main registration wizard orchestrator — Provider Registration Module
 // Sprint scope: Steps 1 → 2 → 3 → 5 (Step 4 bypassed per Agile strategy)
 // Wired to: /src/actions/registerProvider.js (real Supabase submission)

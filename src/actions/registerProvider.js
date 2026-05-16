@@ -75,7 +75,7 @@ export async function registerProvider(formData) {
   const highest_education   = formData.get('highest_education') || null;
   const school_last_attended = formData.get('school_last_attended')?.trim() || null;
   const course_completed    = formData.get('course_completed')?.trim() || null;
-  const year_graduated      = parseInt(formData.get('year_graduated')) || null;
+  const year_graduated      = formData.get('year_graduated')?.trim() || null;
   const employment_history  = formData.get('employment_history')?.trim() || null;
 
   const trade_category = formData.get('trade_category') || null;
@@ -198,7 +198,7 @@ export async function registerProvider(formData) {
     const { error: nsrpError } = await supabase
       .from('nsrp_details')
       .insert({
-        provider_id, last_name, first_name, middle_name, suffix,
+        provider_id: providerId, last_name, first_name, middle_name, suffix,
         date_of_birth, age, sex, civil_status,
         pres_street, pres_barangay, pres_city, pres_province,
         perm_street, perm_barangay, perm_city, perm_province,
@@ -223,11 +223,27 @@ export async function registerProvider(formData) {
 
     // 5e. Insert provider_files
     const fileRows = [
-      { file_type: 'national_id',      file_path: uploadedPaths.national_id },
-      { file_type: 'national_id_back', file_path: uploadedPaths.national_id_back },
-      { file_type: 'photo',            file_path: uploadedPaths.photo },
+      { 
+        file_type: 'national_id',      
+        file_path: uploadedPaths.national_id,
+        original_name: file_national_id.name 
+      },
+      { 
+        file_type: 'national_id_back', 
+        file_path: uploadedPaths.national_id_back,
+        original_name: file_national_id_back.name 
+      },
+      { 
+        file_type: 'photo',            
+        file_path: uploadedPaths.photo,
+        original_name: file_photo.name 
+      },
       uploadedPaths.certificate
-        ? { file_type: 'certificate', file_path: uploadedPaths.certificate }
+        ? { 
+            file_type: 'certificate', 
+            file_path: uploadedPaths.certificate,
+            original_name: file_certificate.name 
+          }
         : null,
     ]
       .filter(Boolean)
