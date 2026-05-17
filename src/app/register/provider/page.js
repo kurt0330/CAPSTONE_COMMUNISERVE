@@ -1,6 +1,5 @@
 // PATH: /src/app/register/provider/page.js
 // Role: Main registration wizard orchestrator — Provider Registration Module
-// Sprint scope: Steps 1 → 2 → 3 → 5 (Step 4 bypassed per Agile strategy)
 // Wired to: /src/actions/registerProvider.js (real Supabase submission)
 
 'use client';
@@ -11,6 +10,7 @@ import StepProgressBar   from '@/components/ui/StepProgressBar';
 import Step1Personal     from '@/components/registration/Step1Personal';
 import Step2Employment   from '@/components/registration/Step2Employment';
 import Step3Trade        from '@/components/registration/Step3Trade';
+import Step4Assessment   from '@/components/registration/Step4Assessment';
 import Step5Files        from '@/components/registration/Step5Files';
 import { useStepValidation } from '@/hooks/useStepValidation';
 
@@ -59,6 +59,11 @@ const INITIAL_FIELDS = {
   employment_history:   '',
   // providers
   trade_category:       '',
+  // step 4 assessment states (Newly Added for Live Tracking)
+  assessment_answers:    {},
+  assessment_test_id:    null,
+  assessment_started_at: null,
+  assessment_skipped:    false,
   // step 5
   terms_agreed:         false,
 };
@@ -70,11 +75,8 @@ const INITIAL_FILES = {
   file_certificate:      null,
 };
 
-// ── Sprint navigation map (Step 4 bypassed) ──────────────────────────────
-// Visual steps shown in progress bar: 1, 2, 3, 4, 5
-// Actual routing sequence:           1, 2, 3,    5
-// completedSteps tracks which buttons go green — we mark 4 done when passing 3→5
-const STEP_SEQUENCE = [1, 2, 3, 5]; // Step 4 intentionally excluded this sprint
+// ── Full linear navigation map including Step 4 ──────────────────────────────
+const STEP_SEQUENCE = [1, 2, 3, 4, 5];
 
 export default function ProviderRegistrationPage() {
   const [currentStep,     setCurrentStep]  = useState(1);
@@ -99,7 +101,6 @@ export default function ProviderRegistrationPage() {
 
     if (movingForward) {
       // Validate the step we're LEAVING
-      // When leaving step 3 to go to step 5, validate step 3
       const errors = validateStep(currentStep, fields, files);
       if (errors.length > 0) {
         showToast(errors[0]);
@@ -107,10 +108,8 @@ export default function ProviderRegistrationPage() {
       }
 
       // Mark current step complete.
-      // When jumping 3→5 also silently mark step 4 as done (bypassed).
       setCompleted((prev) => {
         const next = new Set([...prev, currentStep]);
-        if (currentStep === 3 && target === 5) next.add(4); // mark bypassed step green
         return [...next];
       });
     }
@@ -146,7 +145,12 @@ export default function ProviderRegistrationPage() {
       const fd = new FormData();
 
       Object.entries(fields).forEach(([k, v]) => {
-        fd.append(k, typeof v === 'boolean' ? (v ? '1' : '0') : (v ?? ''));
+        if (k === 'assessment_answers') {
+          // Serialize the nested quiz dictionary cleanly into a string payload
+          fd.append(k, JSON.stringify(v));
+        } else {
+          fd.append(k, typeof v === 'boolean' ? (v ? '1' : '0') : (v ?? ''));
+        }
       });
 
       Object.entries(files).forEach(([k, v]) => {
@@ -154,15 +158,12 @@ export default function ProviderRegistrationPage() {
       });
 
       // Dynamically import the server action to avoid client-bundle inclusion
-      // This is the correct Next.js 14 pattern for calling 'use server' actions
-      // from a 'use client' page without a form element.
       const { registerProvider } = await import('@/actions/registerProvider');
       const result = await registerProvider(fd);
 
       setSubmitResult(result);
 
       if (result.success) {
-        // Mark all steps done (including the bypassed step 4)
         setCompleted([1, 2, 3, 4, 5]);
       } else {
         showToast(result.errors?.[0] ?? 'Submission failed. Please try again.');
@@ -231,17 +232,17 @@ export default function ProviderRegistrationPage() {
         {/* Step 3 — Service / Trade Selection */}
         {currentStep === 3 && !submitResult?.success && (
           <Step3Trade {...stepProps}>
-            {/*
-              Step 4 bypassed this sprint.
-              "Next" from step 3 jumps directly to step 5.
-              The button label makes this transparent to the tester.
-            */}
-            <NavRow
-              onBack={prevStep}
-              onNext={nextStep}
-              nextLabel="Next: File Attachment ›"
-            />
+            <NavRow onBack={prevStep} onNext={nextStep} />
           </Step3Trade>
+        )}
+
+        {/* Step 4 — Competency Assessment (Now Live) */}
+        {currentStep === 4 && !submitResult?.success && (
+          <Step4Assessment 
+            {...stepProps} 
+            onNext={nextStep} 
+            onBack={prevStep} 
+          />
         )}
 
         {/* Step 5 — File Attachment + Submit */}
@@ -335,7 +336,7 @@ function SuccessBanner({ providerId }) {
         <h2>Application Submitted!</h2>
         <p>
           Your registration has been received by the PESO Office.
-          You will be contacted for scheduling your competency assessment.
+          Your skills test score answers have been attached to your system profile file records.
           Your profile goes live once the LGU Admin approves your account.
         </p>
 
@@ -358,7 +359,6 @@ function SuccessBanner({ providerId }) {
         )}
 
         <div style={{ marginTop: 24, display: 'flex', gap: 12, justifyContent: 'center' }}>
-          {/* Placeholder — /auth/login page built in Phase 2 */}
           <a
             href="/auth/login"
             className="btn-next"

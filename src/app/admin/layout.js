@@ -18,12 +18,13 @@ export default async function AdminLayout({ children }) {
   // If the session is missing or role !== 'Admin', redirect immediately.
   const supabase = createServerClient();
 
-  // Get the current Supabase Auth session
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  // Securely get the verified user from the Supabase server
+  const { 
+    data: { user }, 
+    error: authError 
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (authError || !user) {
     redirect('/auth/login');
   }
 
@@ -31,7 +32,7 @@ export default async function AdminLayout({ children }) {
   const { data: publicUser } = await supabase
     .from('users')
     .select('role, full_name')
-    .eq('auth_id', session.user.id)
+    .eq('auth_id', user.id)
     .single();
 
   if (!publicUser || publicUser.role !== 'Admin') {

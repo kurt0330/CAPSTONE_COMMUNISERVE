@@ -1,6 +1,5 @@
 // PATH: /src/actions/registerProvider.js
 // Replaces: php/register_sp.php
-// Full feature parity: multi-table insert, rejection timer, file upload to Supabase Storage
 
 'use server';
 
@@ -9,7 +8,6 @@ import { createClient } from '@supabase/supabase-js';
 const ALLOWED_TRADES = ['Carpenter', 'Electrician', 'Kasambahay'];
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 
-// ── Helper: upload a file to Supabase Storage ──────────────────────
 async function uploadFile(supabase, file, bucket, folder) {
   if (!file || file.size === 0) return null;
   if (file.size > MAX_FILE_BYTES) throw new Error(`${file.name} exceeds 5 MB.`);
@@ -26,18 +24,16 @@ async function uploadFile(supabase, file, bucket, folder) {
 
   if (error) throw new Error(`Storage error: ${error.message}`);
 
-  return uniqueName; // relative path stored in DB
+  return uniqueName;
 }
 
-// ── Main Server Action ─────────────────────────────────────────────
 export async function registerProvider(formData) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
-  // ── 1. Extract all fields (mirrors register_sp.php section 3) ──
-
+  // ── 1. Extract all fields ──
   const email          = formData.get('email')?.trim() || null;
   const contact_number = formData.get('contact_number')?.trim() || null;
   const last_name      = formData.get('last_name')?.trim() || null;
@@ -63,14 +59,12 @@ export async function registerProvider(formData) {
   const mother_contact = formData.get('mother_contact')?.trim() || null;
   const parents_civil_status = formData.get('parents_civil_status') || null;
 
-  // Socio-economic booleans
   const is_4ps_beneficiary = formData.get('is_4ps_beneficiary') === '1';
   const is_indigent        = formData.get('is_indigent') === '1';
   const is_pwd             = formData.get('is_pwd') === '1';
   const is_senior_citizen  = formData.get('is_senior_citizen') === '1';
   const is_solo_parent     = formData.get('is_solo_parent') === '1';
 
-  // Employment
   const employment_status   = formData.get('employment_status') || null;
   const employment_type     = formData.get('employment_type') || 'Not Applicable';
   const unemployment_reason = formData.get('unemployment_reason') || 'Not Applicable';
@@ -83,13 +77,20 @@ export async function registerProvider(formData) {
 
   const trade_category = formData.get('trade_category') || null;
 
+  // Step 4 Assessment variables extraction
+  const assessment_test_id    = formData.get('assessment_test_id') || null;
+  const assessment_started_at = formData.get('assessment_started_at') || null;
+  const assessment_skipped    = formData.get('assessment_skipped') === '1';
+  const assessment_answers_raw = formData.get('assessment_answers');
+  const assessment_answers    = assessment_answers_raw ? JSON.parse(assessment_answers_raw) : {};
+
   // Files
   const file_national_id      = formData.get('file_national_id');
   const file_national_id_back = formData.get('file_national_id_back');
   const file_photo             = formData.get('file_photo');
   const file_certificate       = formData.get('file_certificate');
 
-  // ── 2. Server-side validation (mirrors register_sp.php section 4) ──
+  // ── 2. Server-side validation ──
   const errors = [];
   if (!last_name)           errors.push('Last name is required.');
   if (!first_name)          errors.push('First name is required.');
@@ -115,7 +116,7 @@ export async function registerProvider(formData) {
 
   if (errors.length > 0) return { success: false, errors };
 
-  // ── 3. Rejection timer check (mirrors register_sp.php section 6a) ──
+  // ── 3. Rejection timer check ──
   const { data: existingUser } = await supabase
     .from('users')
     .select('user_id, providers(admin_status, rejected_at)')
@@ -133,7 +134,6 @@ export async function registerProvider(formData) {
           errors: [`Your previous application was rejected. Please wait ${14 - daysSince} more days to re-apply.`],
         };
       }
-      // 14 days passed — delete old record so they can re-register fresh
       await supabase.from('users').delete().eq('user_id', existingUser.user_id);
     } else {
       return {
@@ -143,7 +143,7 @@ export async function registerProvider(formData) {
     }
   }
 
-  // ── 4. Upload files to Supabase Storage ───────────────────────────
+  // ── 4. Upload files to Supabase Storage ──
   let uploadedPaths = {};
   try {
     uploadedPaths.national_id      = await uploadFile(supabase, file_national_id,      'provider-files', 'national_ids');
@@ -156,11 +156,7 @@ export async function registerProvider(formData) {
     return { success: false, errors: [uploadError.message] };
   }
 
-  // ── 5. Database inserts — mirrors PHP transaction (section 6b-f) ──
-  // Supabase doesn't support raw transactions via JS client,
-  // so we use a Postgres function (RPC) for atomicity.
-  // For now: sequential inserts with manual rollback on failure.
-
+  // ── 5. Database inserts ──
   let userId, providerId;
 
   try {
@@ -171,7 +167,7 @@ export async function registerProvider(formData) {
       .insert({
         full_name:     fullName,
         email,
-        password_hash: 'PENDING_RESET', // Admin resets on approval
+        password_hash: 'PENDING_RESET',
         role:          'Provider',
         contact_number,
         barangay:      pres_barangay,
@@ -226,27 +222,11 @@ export async function registerProvider(formData) {
 
     // 5e. Insert provider_files
     const fileRows = [
-      { 
-        file_type: 'national_id',      
-        file_path: uploadedPaths.national_id,
-        original_name: file_national_id.name 
-      },
-      { 
-        file_type: 'national_id_back', 
-        file_path: uploadedPaths.national_id_back,
-        original_name: file_national_id_back.name 
-      },
-      { 
-        file_type: 'photo',            
-        file_path: uploadedPaths.photo,
-        original_name: file_photo.name 
-      },
+      { file_type: 'national_id',      file_path: uploadedPaths.national_id,      original_name: file_national_id.name },
+      { file_type: 'national_id_back', file_path: uploadedPaths.national_id_back, original_name: file_national_id_back.name },
+      { file_type: 'photo',            file_path: uploadedPaths.photo,            original_name: file_photo.name },
       uploadedPaths.certificate
-        ? { 
-            file_type: 'certificate', 
-            file_path: uploadedPaths.certificate,
-            original_name: file_certificate.name 
-          }
+        ? { file_type: 'certificate',  file_path: uploadedPaths.certificate,      original_name: file_certificate.name }
         : null,
     ]
       .filter(Boolean)
@@ -255,6 +235,73 @@ export async function registerProvider(formData) {
     const { error: filesError } = await supabase.from('provider_files').insert(fileRows);
     if (filesError) throw filesError;
 
+    // ── 5f. Secure Server-Side Test Assessment Evaluation Check ──
+    if (assessment_test_id && !assessment_skipped) {
+      try {
+        const { data: questions, error: qErr } = await supabase
+          .from('assessment_questions')
+          .select(`
+            question_id,
+            points,
+            assessment_choices (choice_id, is_correct)
+          `)
+          .eq('test_id', assessment_test_id);
+
+        if (!qErr && questions) {
+          let totalPoints = 0;
+          let earnedPoints = 0;
+
+          questions.forEach((q) => {
+            const pointValue = q.points ?? 1;
+            totalPoints += pointValue;
+            const chosenId = assessment_answers[q.question_id];
+            const correctChoice = q.assessment_choices.find((c) => c.is_correct);
+            if (chosenId && correctChoice && Number(chosenId) === correctChoice.choice_id) {
+              earnedPoints += pointValue;
+            }
+          });
+
+          const { data: testMeta } = await supabase
+            .from('assessment_tests')
+            .select('passing_score')
+            .eq('test_id', assessment_test_id)
+            .single();
+
+          const scorePct = totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : 0;
+          const passed = scorePct >= (testMeta?.passing_score ?? 75);
+
+          const { data: attempt, error: attemptErr } = await supabase
+            .from('assessment_attempts')
+            .insert({
+              provider_id:  providerId,
+              test_id:      assessment_test_id,
+              score_raw:    earnedPoints,
+              score_pct:    Math.round(scorePct * 100) / 100,
+              passed,
+              started_at:   assessment_started_at || new Date().toISOString(),
+              submitted_at: new Date().toISOString(),
+            })
+            .select('attempt_id')
+            .single();
+
+          if (!attemptErr && attempt) {
+            const answerRows = Object.entries(assessment_answers).map(([q_id, c_id]) => ({
+              attempt_id:       attempt.attempt_id,
+              question_id:      Number(q_id),
+              chosen_choice_id: c_id ? Number(c_id) : null,
+            }));
+
+            if (answerRows.length > 0) {
+              await supabase.from('assessment_answers').insert(answerRows);
+            }
+          }
+        }
+      } catch (innerExamErr) {
+        // Handled as non-fatal so database profiles aren't rolled back due to calculation script errors
+        console.error('[Unified Submit Logic] Non-fatal Exam Insert Error:', innerExamErr);
+      }
+    }
+
     return {
       success:     true,
       message:     'Registration submitted. Pending LGU review.',
@@ -262,11 +309,10 @@ export async function registerProvider(formData) {
     };
 
   } catch (dbError) {
-    // Manual rollback — delete in reverse order
+    // Reverse order data rollbacks
     if (providerId) await supabase.from('providers').delete().eq('provider_id', providerId);
     if (userId)     await supabase.from('users').delete().eq('user_id', userId);
 
-    // Clean up uploaded files
     const pathsToDelete = Object.values(uploadedPaths).filter(Boolean);
     if (pathsToDelete.length > 0) {
       await supabase.storage.from('provider-files').remove(pathsToDelete);

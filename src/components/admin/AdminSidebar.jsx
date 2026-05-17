@@ -1,6 +1,5 @@
 // PATH: /src/components/admin/AdminSidebar.jsx
-// Role: Persistent sidebar for all /admin/* pages.
-// 'use client' so the active link highlight can read the current pathname.
+// Change: Added "Skill Assessments" nav item routing to /admin/assessments
 
 'use client';
 
@@ -8,10 +7,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard',         href: '/admin/dashboard', icon: '📊' },
-  { label: 'Service Providers', href: '/admin/providers',  icon: '👷' },
-  { label: 'Clients',           href: '/admin/clients',    icon: '👤' },
-  { label: 'Settings',          href: '/admin/settings',   icon: '⚙️' },
+  { label: 'Dashboard',        href: '/admin/dashboard',    icon: '📊' },
+  { label: 'Service Providers',href: '/admin/providers',    icon: '👷' },
+  { label: 'Skill Assessments',href: '/admin/assessments',  icon: '📝' },
+  { label: 'Clients',          href: '/admin/clients',      icon: '👤' },
+  { label: 'Settings',         href: '/admin/settings',     icon: '⚙️' },
 ];
 
 export default function AdminSidebar() {
@@ -42,17 +42,17 @@ export default function AdminSidebar() {
           const isActive = pathname.startsWith(href);
           return (
             <Link key={href} href={href} style={{
-              display:      'flex',
-              alignItems:   'center',
-              gap:          12,
-              padding:      '10px 22px',
-              fontSize:     13.5,
-              fontWeight:   600,
-              color:        isActive ? '#0504AA' : '#444',
+              display:        'flex',
+              alignItems:     'center',
+              gap:            12,
+              padding:        '10px 22px',
+              fontSize:       13.5,
+              fontWeight:     600,
+              color:          isActive ? '#0504AA' : '#444',
               textDecoration: 'none',
-              borderLeft:   isActive ? '3px solid #0504AA' : '3px solid transparent',
-              background:   isActive ? '#eef0ff' : 'transparent',
-              transition:   'all 0.2s',
+              borderLeft:     isActive ? '3px solid #0504AA' : '3px solid transparent',
+              background:     isActive ? '#eef0ff' : 'transparent',
+              transition:     'all 0.2s',
             }}>
               <span style={{ fontSize: 16, width: 18, textAlign: 'center' }}>{icon}</span>
               {label}
@@ -69,7 +69,6 @@ export default function AdminSidebar() {
         System
       </p>
 
-      {/* Logout — hits Supabase signOut via a small API route (Phase 2 Step 5) */}
       <Link href="/auth/logout" style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '10px 22px', fontSize: 13.5, fontWeight: 600,
