@@ -2,6 +2,7 @@
 import { redirect } from 'next/navigation';
 import { createServerClient } from '@/lib/supabase/server';
 import { createClient } from '@supabase/supabase-js';
+import LogoutButton from '@/components/provider/LogoutButton';
 
 export const metadata = {
   title: 'Provider Dashboard — CommuniServe',
@@ -76,9 +77,9 @@ export default async function AuthenticatedProviderLayout({ children }) {
             </div>
           </div>
 
-          <a href="/provider/logout" style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12, fontWeight: 600, textDecoration: 'none', padding: '6px 12px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.25)', marginLeft: 10 }}>
-            Sign Out
-          </a>
+          <LogoutButton />
+
+
         </div>
       </header>
 
