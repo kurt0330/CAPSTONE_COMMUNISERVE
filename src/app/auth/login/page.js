@@ -51,7 +51,19 @@ export default function LoginPage() {
         router.push('/provider/dashboard'); // Returning user
       }
     } else if (userData.role === 'Customer') {
-      router.push('/customer/dashboard'); // Future Sprint
+      // ── CONFIRM EMAIL SECURE GATE ──
+      if (!authData.user.email_confirmed_at) {
+        await supabase.auth.signOut();
+        setError(
+          'Your email address has not been verified yet. ' +
+          'Please check your inbox for the 6-digit confirmation code, ' +
+          'then complete registration at /register/customer.'
+        );
+        setLoading(false);
+        return;
+      }
+      // If verified, let them in!
+      router.push('/customer/dashboard');
     } else {
       setError('Unrecognized user role.');
       setLoading(false);
@@ -119,9 +131,12 @@ export default function LoginPage() {
         </form>
       </div>
 
-      <p style={{ marginTop: 24, fontSize: 12, color: '#aaa', textAlign: 'center' }}>
-        Not registered yet? <br />
-        <a href="/register/provider" style={{ color: '#0504AA', fontWeight: 600, textDecoration: 'none' }}>Apply as a Service Provider</a>
+      {/* ── UPDATED SIGN-UP MATRIX FOOTER ── */}
+      <p style={{ marginTop: 24, fontSize: 13, color: '#777', textAlign: 'center', lineHeight: '20px' }}>
+        New to CommuniServe? <br />
+        <a href="/register/customer" style={{ color: '#0504AA', fontWeight: 600, textDecoration: 'none' }}>Sign Up as a Customer</a>
+        <span style={{ color: '#ccc', margin: '0 8px' }}>|</span>
+        <a href="/register/provider" style={{ color: '#0504AA', fontWeight: 600, textDecoration: 'none' }}>Apply as a Provider</a>
       </p>
     </div>
   );
