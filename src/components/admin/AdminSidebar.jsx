@@ -1,6 +1,4 @@
 // PATH: /src/components/admin/AdminSidebar.jsx
-// Change: Added "Skill Assessments" nav item routing to /admin/assessments
-
 'use client';
 
 import Link from 'next/link';
@@ -8,9 +6,9 @@ import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
   { label: 'Dashboard',        href: '/admin/dashboard',    icon: '📊' },
-  { label: 'Service Providers',href: '/admin/providers',    icon: '👷' },
-  { label: 'Skill Assessments',href: '/admin/assessments',  icon: '📝' },
-  { label: 'Clients',          href: '/admin/clients',      icon: '👤' },
+  { label: 'Service Providers',href: '/admin/providers',    icon: '👥' },
+  { label: 'Skill Assessments',href: '/admin/assessments',  icon: '📋' },
+  // ── Removed Clients nav item here as Admin only manages service providers ──
   { label: 'Settings',         href: '/admin/settings',     icon: '⚙️' },
 ];
 
@@ -32,12 +30,12 @@ export default function AdminSidebar() {
       <p style={{
         fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
         letterSpacing: '1.2px', color: '#aaa',
-        padding: '0 22px 6px', margin: '16px 0 0',
+        padding: '0 22px 6px', margin: '0 0 8px',
       }}>
-        Main
+        Navigation
       </p>
 
-      <nav>
+      <nav style={{ display: 'flex', flexDirection: 'column' }}>
         {NAV_ITEMS.map(({ label, href, icon }) => {
           const isActive = pathname.startsWith(href);
           return (
@@ -72,14 +70,11 @@ export default function AdminSidebar() {
       <Link href="/auth/logout" style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '10px 22px', fontSize: 13.5, fontWeight: 600,
-        color: '#E24B4A', textDecoration: 'none',
-        borderLeft: '3px solid transparent',
-        transition: 'all 0.2s',
+        color: '#E24B4A', textDecoration: 'none', transition: 'all 0.2s'
       }}>
         <span style={{ fontSize: 16, width: 18, textAlign: 'center' }}>🚪</span>
-        Logout
+        Sign Out
       </Link>
-
     </aside>
   );
 }

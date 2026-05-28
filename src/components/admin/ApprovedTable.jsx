@@ -63,14 +63,24 @@ export default function ApprovedTable({ onStatsChange }) {
           value={tradeFilter}
           onChange={(e) => setTradeFilter(e.target.value)}
           style={{
-            padding: '8px 12px', border: '1px solid #ddd',
-            borderRadius: 6, fontSize: 13, fontFamily: 'Arial, sans-serif',
-            color: '#444', cursor: 'pointer', outline: 'none',
+            flex: '0 0 240px',             
+            padding: '8px 12px',
+            border: '1px solid #ddd',
+            borderRadius: 6, 
+            fontSize: 13, 
+            fontFamily: 'Arial, sans-serif',
+            color: '#444', 
+            cursor: 'pointer', 
+            outline: 'none',
+            backgroundColor: '#fff',
           }}
         >
           <option value="">All Trades</option>
-          {['Carpenter', 'Electrician', 'Kasambahay', 'Nanny', 'Other'].map((t) => (
-            <option key={t} value={t}>{t}</option>
+          {['Carpenter', 'Electrician', 'Kasambahay'].map((t) => (
+           
+            <option key={t} value={t}>
+              {`\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0${t}`}
+            </option>
           ))}
         </select>
         <button

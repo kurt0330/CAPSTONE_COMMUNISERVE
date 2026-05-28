@@ -324,10 +324,6 @@ export default function RegisterForm() {
           </form>
 
           <p style={styles.switchLink}>
-            Already have an account?{' '}
-            <a href="/auth/login" style={styles.link}>Sign in here →</a>
-          </p>
-          <p style={styles.switchLink}>
             Are you a service provider?{' '}
             <a href="/register/provider" style={styles.link}>Apply here →</a>
           </p>

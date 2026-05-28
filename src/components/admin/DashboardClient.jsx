@@ -1,86 +1,97 @@
 // PATH: /src/components/admin/DashboardClient.jsx
-// Role: Client shell for the dashboard — renders stat cards and tab state.
-// Receives pre-fetched counts from the Server Component above.
-// Tables fetch their own data via /api/admin/providers.
-
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import PendingTable  from '@/components/admin/PendingTable';
 import ApprovedTable from '@/components/admin/ApprovedTable';
+import ProviderPieChart from '@/components/admin/ProviderPieChart';
 
 const STAT_CONFIG = [
   { key: 'pending',  label: 'Pending Requests', icon: '⏳', color: '#e6a817', bg: '#fff8e6' },
   { key: 'approved', label: 'Approved SPs',      icon: '✅', color: '#1D9E75', bg: '#e6f7f1' },
-  { key: 'clients',  label: 'Registered Clients',icon: '👤', color: '#0504AA', bg: '#eef0ff' },
 ];
 
 export default function DashboardClient({ initialStats }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('pending');
   const [stats, setStats]         = useState(initialStats);
 
-  // Called by PendingTable/ApprovedTable after approve/reject
-  // so the stat cards update without a full page reload
   function refreshStats(patch) {
     setStats((prev) => ({ ...prev, ...patch }));
+    router.refresh();
   }
 
   return (
     <>
       {/* ── Page Title ── */}
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0504AA', margin: '0 0 2px' }}>
-          Dashboard
-        </h2>
-        <p style={{ fontSize: 13, color: '#777', margin: 0 }}>
-          Welcome back, <strong>Admin</strong>. Here's what needs your attention.
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#111', margin: '0 0 6px' }}>
+          Admin Dashboard
+        </h1>
+        <p style={{ color: '#666', fontSize: 14, margin: 0 }}>
+          Monitor system metrics and review new provider applications.
         </p>
       </div>
 
-      {/* ── Stat Cards ── */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 16, marginBottom: 28,
+      {/* ── Repositioned Summary Section Grid ── */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: '1fr 1.3fr', 
+        gap: 24, 
+        marginBottom: 32,
+        alignItems: 'stretch'
       }}>
-        {STAT_CONFIG.map(({ key, label, icon, color, bg }) => (
-          <div key={key} style={{
-            background: '#fff', borderRadius: 10,
-            padding: '18px 20px',
-            display: 'flex', alignItems: 'center', gap: 16,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-            borderLeft: `4px solid ${color}`,
-          }}>
-            <div style={{
-              width: 46, height: 46, borderRadius: 10,
-              background: bg, color,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 20, flexShrink: 0,
+        
+        {/* Left Column: Stacked Stat Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, justifyContent: 'space-between' }}>
+          {STAT_CONFIG.map(({ key, label, icon, color, bg }) => (
+            <div key={key} style={{ 
+              background: '#fff', 
+              borderRadius: 12, 
+              padding: '24px 28px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 24, 
+              flex: 1,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)' 
             }}>
-              {icon}
-            </div>
-            <div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: '#222', lineHeight: 1 }}>
-                {stats[key]}
+              <div style={{ width: 60, height: 60, borderRadius: 12, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>
+                {icon}
               </div>
-              <div style={{ fontSize: 12, color: '#888', marginTop: 4, fontWeight: 600 }}>
-                {label}
+              <div>
+                <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: '#777', letterSpacing: '0.5px' }}>
+                  {label}
+                </p>
+                <h2 style={{ margin: 0, fontSize: 34, fontWeight: 800, color: color, lineHeight: 1 }}>
+                  {stats[key]}
+                </h2>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Right Column: High-Prominence Analytics Pie Chart Card */}
+        <div style={{ 
+          background: '#fff', 
+          borderRadius: 12, 
+          padding: '24px 32px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          boxShadow: '0 4px 12px rgba(0,0,0,0.03)' 
+        }}>
+          <ProviderPieChart data={stats.trades} />
+        </div>
+
       </div>
 
-      {/* ── Tab Card ── */}
-      <div style={{
-        background: '#fff', borderRadius: 10,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden',
-      }}>
-
-        {/* Tab Headers */}
+      {/* ── Main Content Area ── */}
+      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.03)', minHeight: 400, overflow: 'hidden' }}>
+        
+        {/* Tabs */}
         <div style={{
-          display: 'flex', gap: 4,
-          padding: '16px 20px 0',
-          borderBottom: '2px solid #e8e8e8',
+          display: 'flex', gap: 24, padding: '0 20px',
+          borderBottom: '1px solid #e8e8e8',
         }}>
           {[
             { key: 'pending',  label: `Pending Requests`, badge: stats.pending },
@@ -118,7 +129,6 @@ export default function DashboardClient({ initialStats }) {
           {activeTab === 'pending'  && <PendingTable  onStatsChange={refreshStats} />}
           {activeTab === 'approved' && <ApprovedTable onStatsChange={refreshStats} />}
         </div>
-
       </div>
     </>
   );
