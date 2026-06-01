@@ -311,7 +311,7 @@ export default function UnifiedAuthPage() {
                     required 
                     style={{ 
                       padding: '12px 14px', 
-                      paddingRight: '44px', // Extra padding for the icon
+                      paddingRight: '44px', 
                       border: '1px solid #ddd', 
                       borderRadius: 8, 
                       fontSize: 14, 

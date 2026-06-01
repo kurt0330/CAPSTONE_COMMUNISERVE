@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center - User Manual</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <img src="./images/Logo.png" alt="CommuniServe Logo" class="logo-img">
+            </div>
+            <span class="divider">|</span>
+            <span class="sub-title">User Manual</span>
+        </div>
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search guides...">
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="menu-group active">
+                <div class="menu-header" onclick="toggleMenu(this)">
+                    <span>👥 For Customers</span>
+                    <span class="arrow">▲</span>
+                </div>
+                <ul class="menu-list">
+                    <li id="side-step-1" class="active" onclick="navigateToPage('customer', 1)">🏠 Getting Started</li>
+                    <li id="side-step-2" onclick="navigateToPage('customer', 2)">👤 Create Account</li>
+                    <li id="side-step-3" onclick="navigateToPage('customer', 3)">🔑 Sign In</li>
+                    <li id="side-step-4" onclick="navigateToPage('customer', 4)">📅 Find a Provider</li>
+                    <li id="side-step-5" onclick="navigateToPage('customer', 5)">📍 Track Your Request</li>
+                    <li id="side-step-6" onclick="navigateToPage('customer', 6)">⚙️ Profile & Settings</li>
+                </ul>
+            </div>
+
+            <div class="menu-group">
+                <div class="menu-header" onclick="toggleMenu(this)">
+                    <span>💼 For Service Providers</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <ul class="menu-list collapsed">
+                    <li id="provider-side-step-1" onclick="navigateToPage('provider', 1)">🏠 Getting Started</li>
+                    <li class="registration-container">
+                        <div id="provider-side-step-2" class="registration-header" onclick="navigateToPage('provider', 2)">
+                            👤 Registration
+                        </div>
+                        <ul class="registration-bullets">
+                            <li id="provider-side-step-2-1" onclick="navigateToPage('provider', 2, 1)">Step 1: Personal Information</li>
+                            <li id="provider-side-step-2-2" onclick="navigateToPage('provider', 2, 2)">Step 2: Professional Profile</li>
+                            <li id="provider-side-step-2-3" onclick="navigateToPage('provider', 2, 3)">Step 3: Service Selection</li>
+                            <li id="provider-side-step-2-4" onclick="navigateToPage('provider', 2, 4)">Step 4: Assessment</li>
+                            <!-- CHANGED BOTH ID AND PARAMETER TO 5 BELOW -->
+                            <li id="provider-side-step-2-5" onclick="navigateToPage('provider', 2, 5)">Step 5: File Attachment</li>
+                        </ul>
+                    </li>
+                    <li id="provider-side-step-3" onclick="navigateToPage('provider', 3)">🔑 Sign In</li>
+                    <li id="provider-side-step-4" onclick="navigateToPage('provider', 4)">🛡️ Verification</li>
+                    <li id="provider-side-step-5" onclick="navigateToPage('provider', 5)">📋 Manage Requests</li>
+                    <li id="provider-side-step-6" onclick="navigateToPage('provider', 6)">⏱️ Update Status</li>
+                    <li id="provider-side-step-7" onclick="navigateToPage('provider', 7)">⚙️ Profile & Settings</li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <section id="page-1" class="page-content active">
+                <div class="card">
+                    <h2>1. Getting Started</h2>
+                    <p class="subtitle">Learn the basics of using our platform as a customer.</p>
+                    <hr class="section-divider">
+
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Navigate to our website (CommuniServe)</div>
+                            </div>     
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Click on the "Sign Up as Customer" button on the homepage to create account.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Click on the "Sign In" button on the homepage to sign in your account.</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-container">
+                            <img src="./images/Main page.png" alt="CommuniServe Registration Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+            </section>
+
+            <section id="page-2" class="page-content">
+                <div class="card">
+                    <h2>2. Create Account</h2>
+                    <p class="subtitle">Follow the steps to create your account and start using our services.</p>
+                    <hr class="section-divider">
+
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Fill out the required information in the fields accurately.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Select your location and set a secure password.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Click submit Create Account.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Open your Gmail Account for verification.</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-container">
+                            <img src="./images/Create Account (Customer).png" alt="CommuniServe Registration Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Make sure to fill it out legibly and provide valid email address for verification.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-3" class="page-content">
+                <div class="card">
+                    <h2>3. Sign in Account</h2>
+                    <p class="subtitle">Follow the steps to sign in to your account.</p>
+                    <hr class="section-divider">
+
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Provide your registered email address and secure account password.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Click on the blue "Sign In" button to launch your dashboard.</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-container">
+                            <img src="./images/Sign in.png" alt="CommuniServe Sign In Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Double-check your spelling and caps-lock state if you experience credential errors.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-4" class="page-content">
+                <div class="card">
+                    <h2>4. Find a Provider</h2>
+                    <p class="subtitle">Find local service providers and hire.</p>
+                    <hr class="section-divider">
+
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Step 1.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Step 2.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Step 3</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-container">
+                            <img src="./images/Book a Service.png" alt="CommuniServe Booking Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Be descriptive with your request details to help providers estimate the task accurately.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-5" class="page-content">
+                <div class="card">
+                    <h2>5. Track Your Request</h2>
+                    <p class="subtitle">Monitor the real-time progress status of your service requests.</p>
+                    <hr class="section-divider">
+
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Step 1.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Step 2.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Step 3</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-container">
+                            <img src="./images/Track Your Request.png" alt="CommuniServe Tracking Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Status badges change automatically in real-time as your service provider updates their progress.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-6" class="page-content">
+                <div class="card">
+                    <h2>6. Profile & Settings</h2>
+                    <p class="subtitle">Manage your personal details, location preferences, and contact records.</p>
+                    <hr class="section-divider">
+
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Step 1.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Step 2.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Step 3</div>
+                            </div>
+                        </div>
+
+                        <div class="screenshot-container">
+                            <img src="./images/Profile and Settings.png" alt="CommuniServe Profile and Setting Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Keep your phone number accurate so service providers can successfully reach you upon request acceptance.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SERVICE PROVIDER PAGES ================= -->
+            <section id="provider-page-1" class="page-content">
+                <div class="card">
+                    <h2>1. Getting Started</h2>
+                    <p class="subtitle">Learn how to join CommuniServe as an expert service provider.</p>
+                    <hr class="section-divider">
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Navigate to the main portal and click "Apply as a Provider" to register your account.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Click the green-circled "Log In" button above if you already have an account.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/SP Main Page.png" alt="Provider Portal" class="manual-screenshot">
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Prepare your valid structural credentials and identification documents beforehand to ensure a smooth application process.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SUB BULLETS UNDER SERVICE PROVIDER (5) ================= -->
+            <section id="provider-page-2-1" class="page-content">
+                <div class="card">
+                    <h2>2. Registration — Step 1: Personal Information</h2>
+                    <p class="subtitle">Provide your legal name, contact credentials, and profile details.</p>
+                    <hr class="section-divider">
+                    
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Fill out your full legal name, gender, date of birth, and primary contact number.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Complete your residential address details, selecting your current village and local barangay.</div>
+                            </div>
+                        </div>
+                         <div class="screenshot-container">
+                            <img src="./images/1.1.png" alt="Personal Info" class="manual-screenshot">
+                        </div>
+                    </div>
+                     <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Input your parents' or legal guardians' full names, contact numbers, and current civil status.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Check any applicable background status cards that apply to your household (e.g., 4Ps, PWD, Indigent).</div>
+                            </div>
+                             <div class="step-item">
+                                <div class="step-number">5</div>
+                                <div class="step-text">Review all input fields for completeness and accuracy, then click the blue "Next" button.</div>
+                            </div>
+                        </div>
+                         <div class="screenshot-container">
+                             <img src="./images/1.2.png" alt="Contact Info" class="manual-screenshot">
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Make sure to fill it out legibly and provide valid email address for verification.</p>
+                            <p>Ensure your background status indicators (like 4Ps or PWD) match your government records for accurate profiling.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="provider-page-2-2" class="page-content">
+                <div class="card">
+                    <h2>2. Registration — Step 2: Professional Profile</h2>
+                    <p class="subtitle">Provide your employment status, educational background, and work history.</p>
+                    <hr class="section-divider">
+                    
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Choose between "Employed" or "Unemployed," and specify your type of employment.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Select your highest educational attainment, input your graduation year, school last attended, and course completed.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Briefly write your previous work experience in the text field provided (Optional).</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Click "Back" to review previous details, or click the blue "Next" button to save and proceed.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                             <img src="./images/2.1.png" alt="Profession Profile" class="manual-screenshot">
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Highlighting relevant past technical experiences helps the review panel build higher trust in your capability profile.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="provider-page-2-3" class="page-content">
+                <div class="card">
+                    <h2>2. Registration — Step 3: Service Selection</h2>
+                    <p class="subtitle">Choose your primary service categories and specialized talents.</p>
+                    <hr class="section-divider">
+                    
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Select the primary service card you will offer (e.g., Carpenter, Electrician, or Kasambahay).</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Click the gray "Back" button to return to the previous section, or click the blue "Next" button to save and proceed.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/3.1.png" alt="Service Selection" class="manual-screenshot">
+                        </div>
+                    </div>
+                      <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Make sure to choose the specific skill segment you are fully certified or prepared to handle safely.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="provider-page-2-4" class="page-content">
+                <div class="card">
+                    <h2>2. Registration — Step 4: Assessment</h2>
+                    <p class="subtitle">You must pass this initial assessment test to qualify your profile for verification and service placement.</p>
+                    <hr class="section-divider">
+                    
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Check the total items, layout overview, and the required 75% passing matrix threshold before beginning.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">YClick the blue "Start Assessment" button to open the questionnaire.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Click the gray "Back button" if you need to return to the service selection tab to adjust your choices.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/4.1.png" alt="Assessment" class="manual-screenshot">
+                        </div>
+
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Monitor your email for an application update containing your final assessment result score percentage.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">5</div>
+                                <div class="step-text">If your score falls below the threshold, you may click "Return to CommuniServe" to re-apply and retake the skill assessment after 14 days.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/Assessment Score.png" alt="Assessment" class="manual-screenshot">
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Ensure an uninterrupted network environment before tapping start; dropping early counts toward the score submission.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="provider-page-2-5" class="page-content">
+                <div class="card">
+                    <h2>2. Registration — Step 5: File Attachment</h2>
+                    <p class="subtitle">Upload necessary identifying credentials to prepare for screening verification.</p>
+                    <hr class="section-divider">
+                    
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Ensure your documents are in JPG, PNG, or PDF format, and do not exceed 5 MB per file.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Click Choose File to upload the required front and back views of your National ID (PhilSys / PSA) along with a recent 2×2 ID Photo with a white background.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Upload your Trade Certificate or TESDA NC if available to highlight your qualifications.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Review your uploaded attachments for clarity and legibility, then proceed to submit your profile.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/5.1.png" alt="File Attachment" class="manual-screenshot">
+                        </div>
+
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">5</div>
+                                <div class="step-text">Ensure your documents are in JPG, PNG, or PDF format, and do not exceed 5 MB per file.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/5.1.png" alt="File Attachment" class="manual-screenshot">
+                        </div>
+
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">6</div>
+                                <div class="step-text">After submitting, monitor your email for your results within 1–2 weeks.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/Submission.png" alt="File Attachment" class="manual-screenshot">
+                        </div>     
+                        
+                         <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">7</div>
+                                <div class="step-text">You will receive an email notifying you of the PESO Office decision; approved applications will include temporary credentials, while rejected applicants will be notified of the denial.</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">8</div>
+                                <div class="step-text">If approved, click "Access Your Dashboard" to log in, where you will be required to change your temporary password on your first login.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/Approved.png" alt="File Attachment" class="manual-screenshot">
+                        </div>   
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">💡</span>
+                        <div class="tip-content">
+                            <strong>Notice</strong>
+                            <p>Upload clean, bright photos of your National ID. Blurry files or cut edges may cause unexpected verification processing delays or account rejections.</p>
+                            <p>The system verification queue is manually checked by system administrators. Expect status alignment updates within 3-5 business days.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="provider-page-3" class="page-content">
+                <h2>3. Sign in Account</h2>
+                <p class="subtitle">Follow the steps to sign in to your account.</p>
+                <hr class="section-divider">
+
+                <div class="grid-container">
+                    <div class="steps-timeline">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Provide your registered email address into the username field.</div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Enter your secure password. If you are a new user logging in for the first time, use the default temporary password provided by the PESO Office in your approval email.</div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Click on the blue "Sign In" button to launch your dashboard. First-time users will be prompted to change their temporary password immediately.</div>
+                        </div>
+                    </div>
+
+                    <div class="screenshot-container">
+                        <img src="./images/Sign in.png" alt="CommuniServe Sign In Screen" class="manual-screenshot">
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <span class="tip-icon">💡</span>
+                    <div class="tip-content">
+                        <strong>First-Time Login Notice</strong>
+                        <p>New accounts must enter the default credentials sent via email. You will be required to update this temporary password upon successful entry to secure your dashboard.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="provider-page-4" class="page-content">
+                <div class="card">
+                    <h2>4. Verification</h2>
+                    <p class="subtitle">Short Description</p>
+                    <hr class="section-divider">
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Step 1</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/Provider Verification.png" alt="Provider Verification Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="provider-page-5" class="page-content">
+                <div class="card">
+                    <h2>5. Manage Requests</h2>
+                    <p class="subtitle">View, prioritize, or process job requests requested near you.</p>
+                    <hr class="section-divider">
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Review job order cards detailing client requirements and locations.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/Provider Manage Requests.png" alt="Provider Request Management Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="provider-page-6" class="page-content">
+                <div class="card">
+                    <h2>6. Update Status</h2>
+                    <p class="subtitle">Short description</p>
+                    <hr class="section-divider">
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Step 1</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/Provider Manage Requests.png" alt="Provider Request Management Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="provider-page-7" class="page-content">
+                <div class="card">
+                    <h2>7. Profile & Settings</h2>
+                    <p class="subtitle">Configure professional details and structural service scopes.</p>
+                    <hr class="section-divider">
+                    <div class="grid-container">
+                        <div class="steps-timeline">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Manage structural workspace details, schedule intervals, and region settings.</div>
+                            </div>
+                        </div>
+                        <div class="screenshot-container">
+                            <img src="./images/Provider Profile and Settings.png" alt="Provider Profile Settings Screen" class="manual-screenshot">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <footer class="pagination-footer">
+                <button class="btn btn-prev" onclick="changePage(-1)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <span class="page-indicator" id="page-num-display">1 of 6</span>
+                <button class="btn btn-next" onclick="changePage(1)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </footer>
+        </main>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>

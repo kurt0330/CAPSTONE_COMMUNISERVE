@@ -340,7 +340,7 @@ function SuccessBanner({ providerId }) {
           Your profile goes live once the LGU Admin approves your account.
         </p>
 
-        {/* ── DEV helper: shows provider_id returned from Supabase ── */}
+        {/* ── User Feedback: Successful application submission notice ── */}
         {providerId && (
           <div
             style={{
@@ -348,13 +348,13 @@ function SuccessBanner({ providerId }) {
               padding: '10px 18px',
               background: 'var(--sp-teal-tint)',
               borderRadius: 8,
-              fontSize: 12,
+              fontSize: 14,
               color: 'var(--sp-teal)',
               fontFamily: 'monospace',
               display: 'inline-block',
             }}
           >
-            ✓ Provider ID: <strong>{providerId}</strong> — record confirmed in Supabase
+            ✓ Application successfully submitted! Approval typically takes 1–2 weeks—please watch your email for an official notice of your results.
           </div>
         )}
 

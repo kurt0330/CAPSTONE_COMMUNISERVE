@@ -11,13 +11,29 @@ import { createClient } from '@/lib/supabase/client';
 
 // ── Anini-y barangay list (complete) ──────────────────────────────────────
 const BARANGAYS = [
-  'Aluyan', 'Bagumbayan', 'Barangay 1 (Pob.)', 'Barangay 2 (Pob.)',
-  'Barangay 3 (Pob.)', 'Barangay 4 (Pob.)', 'Barangay 5 (Pob.)',
-  'Barangay 6 (Pob.)', 'Barangay 7 (Pob.)', 'Biga-a', 'Bugasong',
-  'Carataya', 'Casit-an', 'Dag-ang', 'Igbaras', 'Igpulong', 'Igtiig',
-  'Igtuba', 'Katipunan', 'Lantangan', 'Magsaysay', 'Pang-itan', 'Patria',
-  'San Joaquin', 'Sion (Pob.)', 'Tigbaluan', 'Tig-Apog-apog',
-  'Tubod-Dugaya', 'Tubod-Kamping',
+  'Bayo Grande',
+  'Bayo Pequeño',
+  'Butuan',
+  'Casay',
+  'Casay Viejo',
+  'Iba',
+  'Igbarabatuan',
+  'Igpalge',
+  'Igtumarom',
+  'Lisub A',
+  'Lisub B',
+  'Mabuyong',
+  'Magdalena',
+  'Nasuli C',
+  'Nato',
+  'Poblacion',
+  'Sagua',
+  'Salvacion',
+  'San Francisco',
+  'San Ramon',
+  'San Roque',
+  'Tagaytay',
+  'Talisayan'
 ];
 
 export default function RegisterForm() {

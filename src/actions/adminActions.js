@@ -134,13 +134,32 @@ export async function approveProvider(providerId) {
   }
 }
 
-// ── Reject (UNCHANGED FROM YOUR ORIGINAL FILE) ────────────────────────────
+// ── Reject (UPDATED TO FETCH SCORE & SEND NOTIFICATION EMAIL) ─────────────
 export async function rejectProvider(providerId) {
   const supabase = createServerClient();
   try {
     await assertAdmin(supabase);
+    
+    // Use admin client to safely bypass RLS to read email & scores
+    const adminSupa = adminSupabase(); 
 
-    const { error } = await supabase
+    // 1. Fetch provider details, user email, and their assessment attempts
+    const { data: providerRow, error: provErr } = await adminSupa
+      .from('providers')
+      .select(`
+        provider_id,
+        users ( full_name, email ),
+        assessment_attempts ( score_pct, submitted_at )
+      `)
+      .eq('provider_id', providerId)
+      .single();
+
+    if (provErr || !providerRow) throw new Error(`Provider not found: ${provErr?.message}`);
+
+    const providerUser = providerRow.users;
+
+    // 2. Update the status in the database
+    const { error: updateErr } = await adminSupa
       .from('providers')
       .update({
         admin_status: 'Rejected',
@@ -148,7 +167,27 @@ export async function rejectProvider(providerId) {
       })
       .eq('provider_id', providerId);
 
-    if (error) throw error;
+    if (updateErr) throw updateErr;
+
+    // 3. Find their most recent test score from the attempts array
+    let latestScore = 'N/A';
+    if (providerRow.assessment_attempts && providerRow.assessment_attempts.length > 0) {
+      // Sort attempts by submitted_at to grab the newest one
+      const attempts = providerRow.assessment_attempts.sort((a, b) => 
+        new Date(b.submitted_at) - new Date(a.submitted_at)
+      );
+      latestScore = attempts[0].score_pct ? `${attempts[0].score_pct}%` : 'N/A';
+    }
+
+    // 4. Send the rejection email if they have an email on record
+    if (providerUser?.email) {
+      await sendRejectionEmail({
+        to: providerUser.email,
+        fullName: providerUser.full_name,
+        score: latestScore,
+      });
+    }
+
     return { success: true };
 
   } catch (err) {
@@ -185,5 +224,42 @@ async function sendOnboardingEmail({ to, fullName, password }) {
     });
   } catch (emailErr) {
     console.error('[sendOnboardingEmail] failed:', emailErr.message);
+  }
+}
+
+
+// ════════════════════════════════════════════════════════════════
+// REJECTION EMAIL HELPER
+// ════════════════════════════════════════════════════════════════
+async function sendRejectionEmail({ to, fullName, score }) {
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://communiserve.com';
+
+    await resend.emails.send({
+      from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
+      to: [to],
+      subject: 'Update on your CommuniServe Application',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+          <h2 style="color: #E24B4A;">Application Update</h2>
+          <p>Dear ${fullName},</p>
+          <p>Thank you for your interest in joining CommuniServe as a Service Provider. After careful review by the PESO Office, we regret to inform you that your application has not been approved at this time.</p>
+          
+          <div style="background-color: #fff8e6; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #e6a817;">
+            <h3 style="margin-top: 0; color: #333; font-size: 14px; text-transform: uppercase;">Assessment Result</h3>
+            <p style="margin: 5px 0;"><strong>Your Score:</strong> <span style="color: #E24B4A; font-weight: bold; font-size: 16px;">${score}</span></p>
+          </div>
+
+          <p>Don't be discouraged! You may re-apply and retake the skill assessment after <strong>14 days</strong>. We encourage you to review your trade materials and try again.</p>
+          
+          <a href="${siteUrl}" style="display: inline-block; padding: 12px 24px; background: #eef0ff; color: #0504AA; text-decoration: none; font-weight: bold; border-radius: 6px; border: 1px solid #0504AA; margin-top: 10px;">Return to CommuniServe</a>
+          <br><br>
+          <p style="font-size: 12px; color: #666;">Best regards,<br>The CommuniServe Team (PESO Office)</p>
+        </div>
+      `,
+    });
+  } catch (emailErr) {
+    console.error('[sendRejectionEmail] failed:', emailErr.message);
   }
 }
