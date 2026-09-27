@@ -545,3 +545,53 @@
     .socio-grid { grid-template-columns: 1fr; }
     .page-background { padding: 110px 0 40px; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   NATIONAL ID PIN — step 5
+   Providers enter a PIN number instead of uploading an ID photo
+   (CAPSTONE_DOCS.md §0.1 D-1 / BR-17).
+════════════════════════════════════════════════════════════ */
+
+.pin-input-group {
+    margin-bottom: 26px;
+    max-width: 420px;
+}
+
+.pin-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+    font-family: Arial, sans-serif;
+}
+
+.pin-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    letter-spacing: 2px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--sp-border);
+    border-radius: var(--sp-radius);
+    background: #fff;
+    color: #111;
+    outline: none;
+    transition: border-color var(--sp-speed);
+}
+
+.pin-input:focus {
+    border-color: var(--sp-blue);
+}
+
+.pin-hint {
+    font-size: 12px;
+    margin: 8px 0 0;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+    .pin-input { font-size: 16px; letter-spacing: 1.5px; }
+}

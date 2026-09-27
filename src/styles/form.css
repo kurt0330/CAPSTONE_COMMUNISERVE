@@ -10,14 +10,18 @@
 
 .page-container {
     background-color: white;
-    width: 850px;
+    /* Fluid below 850px so the sheet never overflows narrow viewports;
+       identical to the original fixed 850px on wider screens. */
+    width: min(850px, 100%);
+    max-width: 100%;
     min-height: 1056px;
-    padding: 1in; 
+    padding: 1in;
     padding-top: 50px;
     padding-bottom: 50px;
     position: relative;
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     z-index: 5;
+    box-sizing: border-box;
 }
 
 .form-logo {
@@ -225,6 +229,31 @@ small {
 
 .nav-btn:not(.active):hover {
     background-color: #e6e6ff;
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — the registration sheet on tablets and phones.
+   (sp_steps.css carries further ≤768px rules for the wizard's
+    own step panels; these cover the shared form chrome.)
+════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+    .page-background { padding: 130px 20px 40px; }
+    /* The 1in "paper" margin is too wide once the sheet goes fluid. */
+    .page-container  { padding: 40px 28px; }
+}
+
+@media (max-width: 768px) {
+    /* Drop the fixed A4 height — on a phone it renders as dead whitespace. */
+    .page-container   { min-height: 0; }
+    .cell-header      { font-size: 14px; margin-bottom: 20px; }
+    .form-instructions { font-size: 12px; padding: 12px; }
+}
+
+@media (max-width: 480px) {
+    .page-background { padding: 110px 10px 32px; }
+    .page-container  { padding: 28px 16px; }
+    /* .table-input stays at 16px — anything smaller makes iOS zoom on focus. */
 }
 
 @media print {

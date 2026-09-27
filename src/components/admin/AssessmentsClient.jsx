@@ -7,6 +7,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Icon from '@/components/ui/Icon';
 
 const TRADES        = ['Carpenter', 'Electrician', 'Kasambahay'];
 const QUESTIONS_PER_PAGE = 10; // matches exam pagination batch size
@@ -23,10 +24,10 @@ export default function AssessmentsClient() {
   const [tests,        setTests]       = useState([]);
   const [loading,      setLoading]     = useState(true);
   const [activeTab,    setActiveTab]   = useState('Carpenter');
-  const [mode,         setMode]        = useState('view');   // 'view' | 'create'
+  const [mode,         setMode]        = useState('view');   
   const [saving,       setSaving]      = useState(false);
-  const [saveMsg,      setSaveMsg]     = useState(null);     // { text, ok }
-  const [previewPage,  setPreviewPage] = useState(0);        // for question list pagination
+  const [saveMsg,      setSaveMsg]     = useState(null);     
+  const [previewPage,  setPreviewPage] = useState(0);       
 
   // ── Form state ────────────────────────────────────────────
   const [form, setForm] = useState({
@@ -67,7 +68,7 @@ export default function AssessmentsClient() {
   }
 
   function removeQuestion(qIdx) {
-    if (form.questions.length === 1) return; // keep at least one
+    if (form.questions.length === 1) return; 
     setForm((prev) => ({
       ...prev,
       questions: prev.questions.filter((_, i) => i !== qIdx),
@@ -87,7 +88,7 @@ export default function AssessmentsClient() {
       const qs = [...prev.questions];
       const cs = [...qs[qIdx].choices];
       cs[cIdx] = { ...cs[cIdx], [field]: value };
-      // Enforce single correct answer per question
+      
       if (field === 'is_correct' && value === true) {
         cs.forEach((c, i) => { if (i !== cIdx) cs[i] = { ...cs[i], is_correct: false }; });
       }
@@ -108,14 +109,14 @@ export default function AssessmentsClient() {
       });
       const json = await res.json();
       if (json.status === 'success') {
-        setSaveMsg({ text: `✓ Test saved! (ID: ${json.test_id})`, ok: true });
+        setSaveMsg({ text: `Test saved! (ID: ${json.test_id})`, ok: true });
         setMode('view');
         await fetchTests();
       } else {
-        setSaveMsg({ text: `✗ ${json.message}`, ok: false });
+        setSaveMsg({ text: json.message, ok: false });
       }
     } catch (err) {
-      setSaveMsg({ text: `✗ Network error: ${err.message}`, ok: false });
+      setSaveMsg({ text: `Network error: ${err.message}`, ok: false });
     } finally {
       setSaving(false);
     }
@@ -129,14 +130,14 @@ export default function AssessmentsClient() {
 
   // ── Render ────────────────────────────────────────────────
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ fontFamily: 'var(--cs-font)' }}>
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0504AA', margin: '0 0 2px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--cs-primary)', margin: '0 0 2px' }}>
           Skill Assessments
         </h2>
-        <p style={{ fontSize: 13, color: '#777', margin: 0 }}>
+        <p style={{ fontSize: 13, color: 'var(--cs-text-muted)', margin: 0 }}>
           Manage trade-specific competency tests for provider applicants.
         </p>
       </div>
@@ -144,7 +145,7 @@ export default function AssessmentsClient() {
       {/* ── Trade tabs ── */}
       <div style={{
         display: 'flex', gap: 4,
-        borderBottom: '2px solid #e8e8e8',
+        borderBottom: '2px solid var(--cs-border)',
         marginBottom: 24,
       }}>
         {TRADES.map((trade) => (
@@ -154,9 +155,9 @@ export default function AssessmentsClient() {
             onClick={() => { setActiveTab(trade); setMode('view'); setSaveMsg(null); }}
             style={{
               padding: '8px 20px', fontSize: 13.5, fontWeight: 600,
-              color:  activeTab === trade ? '#0504AA' : '#777',
+              color:  activeTab === trade ? 'var(--cs-primary)' : 'var(--cs-text-muted)',
               background: 'transparent', border: 'none',
-              borderBottom: activeTab === trade ? '3px solid #0504AA' : '3px solid transparent',
+              borderBottom: activeTab === trade ? '3px solid var(--cs-primary)' : '3px solid transparent',
               cursor: 'pointer',
             }}
           >
@@ -209,10 +210,11 @@ export default function AssessmentsClient() {
           {saveMsg && (
             <div style={{
               marginTop: 16, padding: '10px 16px', borderRadius: 8,
-              background: saveMsg.ok ? '#e6f7f1' : '#fff5f5',
-              color:      saveMsg.ok ? '#1D9E75' : '#E24B4A',
+              background: saveMsg.ok ? 'var(--cs-success-tint)' : 'var(--cs-danger-tint)',
+              color:      saveMsg.ok ? 'var(--cs-success)' : 'var(--cs-danger)',
               fontWeight: 600, fontSize: 13,
             }}>
+              <Icon name={saveMsg.ok ? 'check' : 'close'} size="xs" style={{ marginRight: 6 }} />
               {saveMsg.text}
             </div>
           )}
@@ -226,8 +228,8 @@ export default function AssessmentsClient() {
         <div>
           {/* Meta fields */}
           <div style={{
-            background: '#fff', borderRadius: 10, padding: '20px 24px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: 20,
+            background: '#fff', borderRadius: 12, padding: '20px 24px',
+            boxShadow: '0 0 0 1px var(--cs-border), var(--cs-shadow-sm)', marginBottom: 20,
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 16, alignItems: 'end' }}>
               <div>
@@ -272,10 +274,11 @@ export default function AssessmentsClient() {
             {saveMsg && (
               <div style={{
                 marginTop: 14, padding: '10px 14px', borderRadius: 8,
-                background: saveMsg.ok ? '#e6f7f1' : '#fff5f5',
-                color:      saveMsg.ok ? '#1D9E75' : '#E24B4A',
+                background: saveMsg.ok ? 'var(--cs-success-tint)' : 'var(--cs-danger-tint)',
+                color:      saveMsg.ok ? 'var(--cs-success)' : 'var(--cs-danger)',
                 fontWeight: 600, fontSize: 13,
               }}>
+                <Icon name={saveMsg.ok ? 'check' : 'close'} size="xs" style={{ marginRight: 6 }} />
                 {saveMsg.text}
               </div>
             )}
@@ -286,21 +289,21 @@ export default function AssessmentsClient() {
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             marginBottom: 12,
           }}>
-            <span style={{ fontSize: 13, color: '#555', fontWeight: 600 }}>
+            <span style={{ fontSize: 13, color: 'var(--cs-text-muted)', fontWeight: 600 }}>
               Questions {pageStart + 1}–{Math.min(pageEnd, form.questions.length)} of {form.questions.length}
             </span>
             <div style={{ display: 'flex', gap: 8 }}>
               <button type="button" style={btnPage}
                 disabled={previewPage === 0}
                 onClick={() => setPreviewPage((p) => p - 1)}
-              >‹ Prev</button>
-              <span style={{ fontSize: 13, color: '#777', padding: '0 4px' }}>
+              ><Icon name="chevron-left" size="xs" /> Prev</button>
+              <span style={{ fontSize: 13, color: 'var(--cs-text-muted)', padding: '0 4px' }}>
                 Page {previewPage + 1} / {totalPages}
               </span>
               <button type="button" style={btnPage}
                 disabled={previewPage >= totalPages - 1}
                 onClick={() => setPreviewPage((p) => p + 1)}
-              >Next ›</button>
+              >Next <Icon name="chevron-right" size="xs" /></button>
             </div>
           </div>
 
@@ -330,8 +333,8 @@ export default function AssessmentsClient() {
               display: 'flex', alignItems: 'center', gap: 8,
               margin: '16px 0',
               padding: '10px 20px',
-              background: '#eef0ff', color: '#0504AA',
-              border: '2px dashed #c0c4f7', borderRadius: 10,
+              background: 'var(--cs-primary-tint)', color: 'var(--cs-primary)',
+              border: '2px dashed var(--cs-border-strong)', borderRadius: 12,
               fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
               width: '100%', justifyContent: 'center',
             }}
@@ -367,10 +370,10 @@ function QuestionCard({
 }) {
   return (
     <div style={{
-      background: '#fff', borderRadius: 10,
+      background: '#fff', borderRadius: 12,
       padding: '18px 20px', marginBottom: 14,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-      borderLeft: '4px solid #0504AA',
+      boxShadow: '0 0 0 1px var(--cs-border), var(--cs-shadow-sm)',
+      borderLeft: '4px solid var(--cs-primary)',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ flex: 1 }}>
@@ -385,7 +388,7 @@ function QuestionCard({
             style={{
               ...inputStyle,
               resize: 'vertical', minHeight: 56,
-              fontFamily: 'Arial, sans-serif',
+              fontFamily: 'var(--cs-font)',
             }}
           />
         </div>
@@ -404,12 +407,13 @@ function QuestionCard({
             onClick={onRemove}
             title="Remove question"
             style={{
-              background: '#fdeaea', border: 'none', borderRadius: 6,
-              color: '#E24B4A', fontSize: 16, cursor: 'pointer',
+              background: 'var(--cs-danger-tint)', border: 'none', borderRadius: 10,
+              color: 'var(--cs-danger)', fontSize: 16, cursor: 'pointer',
               padding: '4px 10px', marginTop: 18, fontWeight: 700,
             }}
+            aria-label="Remove question"
           >
-            ✕
+            <Icon name="close" size="xs" />
           </button>
         )}
       </div>
@@ -424,7 +428,7 @@ function QuestionCard({
               checked={choice.is_correct}
               onChange={() => onCorrectChange(ci)}
               title="Mark as correct answer"
-              style={{ accentColor: '#1D9E75', flexShrink: 0, width: 16, height: 16 }}
+              style={{ accentColor: 'var(--cs-success)', flexShrink: 0, width: 16, height: 16 }}
             />
             <input
               type="text"
@@ -434,13 +438,13 @@ function QuestionCard({
               style={{
                 ...inputStyle,
                 flex: 1,
-                background: choice.is_correct ? '#e6f7f1' : '#fff',
-                borderColor: choice.is_correct ? '#1D9E75' : '#ddd',
+                background: choice.is_correct ? 'var(--cs-success-tint)' : '#fff',
+                borderColor: choice.is_correct ? 'var(--cs-success)' : 'var(--cs-border-strong)',
               }}
             />
             {choice.is_correct && (
-              <span style={{ fontSize: 11, color: '#1D9E75', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                ✓ Correct
+              <span style={{ fontSize: 11, color: 'var(--cs-success)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                <Icon name="check" size="xs" style={{ marginRight: 3 }} />Correct
               </span>
             )}
           </div>
@@ -459,21 +463,21 @@ function TestViewCard({ test, onReplace }) {
 
   return (
     <div style={{
-      background: '#fff', borderRadius: 10,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden',
+      background: '#fff', borderRadius: 12,
+      boxShadow: '0 0 0 1px var(--cs-border), var(--cs-shadow-sm)', overflow: 'hidden',
     }}>
       {/* Header */}
       <div style={{
-        padding: '16px 20px', borderBottom: '1px solid #eee',
+        padding: '16px 20px', borderBottom: '1px solid var(--cs-border)',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div>
-          <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#111' }}>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--cs-text)' }}>
             {test.test_title}
           </p>
-          <p style={{ margin: '3px 0 0', fontSize: 12, color: '#888' }}>
+          <p style={{ margin: '3px 0 0', fontSize: 12, color: 'var(--cs-text-muted)' }}>
             {questions.length} questions · Passing: {test.passing_score}% ·{' '}
-            <span style={{ color: '#1D9E75', fontWeight: 700 }}>● Active</span>
+            <span style={{ color: 'var(--cs-success)', fontWeight: 700 }}>● Active</span>
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -482,7 +486,7 @@ function TestViewCard({ test, onReplace }) {
             {expanded ? 'Hide Questions' : 'Preview Questions'}
           </button>
           <button type="button" style={btnPrimary} onClick={onReplace}>
-            ✏ Replace / Revise
+            <Icon name="edit" size="xs" style={{ marginRight: 6 }} />Replace / Revise
           </button>
         </div>
       </div>
@@ -493,15 +497,15 @@ function TestViewCard({ test, onReplace }) {
           {/* Pagination controls */}
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <span style={{ fontSize: 12, color: '#777' }}>
+              <span style={{ fontSize: 12, color: 'var(--cs-text-muted)' }}>
                 Showing {viewPage * QUESTIONS_PER_PAGE + 1}–{Math.min((viewPage + 1) * QUESTIONS_PER_PAGE, questions.length)} of {questions.length}
               </span>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button type="button" style={btnPage} disabled={viewPage === 0}
-                  onClick={() => setViewPage((p) => p - 1)}>‹ Prev</button>
-                <span style={{ fontSize: 12, color: '#777' }}>Page {viewPage + 1}/{totalPages}</span>
+                  onClick={() => setViewPage((p) => p - 1)}><Icon name="chevron-left" size="xs" /> Prev</button>
+                <span style={{ fontSize: 12, color: 'var(--cs-text-muted)' }}>Page {viewPage + 1}/{totalPages}</span>
                 <button type="button" style={btnPage} disabled={viewPage >= totalPages - 1}
-                  onClick={() => setViewPage((p) => p + 1)}>Next ›</button>
+                  onClick={() => setViewPage((p) => p + 1)}>Next <Icon name="chevron-right" size="xs" /></button>
               </div>
             </div>
           )}
@@ -509,25 +513,27 @@ function TestViewCard({ test, onReplace }) {
           {pageSlice.map((q, i) => (
             <div key={q.question_id} style={{
               marginBottom: 14, padding: '12px 14px',
-              background: '#f8f9fc', borderRadius: 8,
-              borderLeft: '3px solid #0504AA',
+              background: 'var(--cs-bg)', borderRadius: 8,
+              borderLeft: '3px solid var(--cs-primary)',
             }}>
               <p style={{ margin: '0 0 8px', fontWeight: 600, fontSize: 13 }}>
                 {viewPage * QUESTIONS_PER_PAGE + i + 1}. {q.question_text}
-                <span style={{ marginLeft: 8, fontSize: 11, color: '#aaa' }}>({q.points} pt{q.points !== 1 ? 's' : ''})</span>
+                <span style={{ marginLeft: 8, fontSize: 11, color: 'var(--cs-text-soft)' }}>({q.points} pt{q.points !== 1 ? 's' : ''})</span>
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {q.assessment_choices.map((c) => (
                   <div key={c.choice_id} style={{
                     display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '5px 10px', borderRadius: 6,
-                    background: c.is_correct ? '#e6f7f1' : 'transparent',
+                    padding: '5px 10px', borderRadius: 10,
+                    background: c.is_correct ? 'var(--cs-success-tint)' : 'transparent',
                     fontSize: 13,
                   }}>
-                    <span style={{ color: c.is_correct ? '#1D9E75' : '#aaa', fontWeight: 700, fontSize: 11 }}>
-                      {c.is_correct ? '✓' : '○'}
+                    <span style={{ color: c.is_correct ? 'var(--cs-success)' : 'var(--cs-text-soft)', fontWeight: 700, fontSize: 11 }}>
+                      {c.is_correct
+                        ? <Icon name="check" size="xs" />
+                        : <span style={{ display: 'inline-block', width: 9, height: 9, borderRadius: '50%', border: '1.5px solid currentColor' }} />}
                     </span>
-                    <span style={{ color: c.is_correct ? '#1D9E75' : '#444', fontWeight: c.is_correct ? 700 : 400 }}>
+                    <span style={{ color: c.is_correct ? 'var(--cs-success)' : 'var(--cs-text-muted)', fontWeight: c.is_correct ? 700 : 400 }}>
                       {c.choice_text}
                     </span>
                   </div>
@@ -544,15 +550,15 @@ function TestViewCard({ test, onReplace }) {
 function EmptyState({ trade, onCreate }) {
   return (
     <div style={{
-      background: '#fff', borderRadius: 10, padding: '48px 24px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+      background: '#fff', borderRadius: 12, padding: '48px 24px',
+      boxShadow: '0 0 0 1px var(--cs-border), var(--cs-shadow-sm)',
       textAlign: 'center',
     }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>📝</div>
-      <h3 style={{ fontSize: 16, fontWeight: 700, color: '#333', margin: '0 0 8px' }}>
+      <div style={{ marginBottom: 16, color: 'var(--cs-text-soft)' }}><Icon name="file" size="2xl" /></div>
+      <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--cs-text)', margin: '0 0 8px' }}>
         No Active Test for {trade}
       </h3>
-      <p style={{ fontSize: 13, color: '#888', margin: '0 0 20px' }}>
+      <p style={{ fontSize: 13, color: 'var(--cs-text-muted)', margin: '0 0 20px' }}>
         Create the first assessment for this trade category.
       </p>
       <button type="button" style={btnPrimary} onClick={onCreate}>
@@ -565,13 +571,13 @@ function EmptyState({ trade, onCreate }) {
 function SkeletonCard() {
   return (
     <div style={{
-      background: '#fff', borderRadius: 10, padding: '24px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+      background: '#fff', borderRadius: 12, padding: '24px',
+      boxShadow: '0 0 0 1px var(--cs-border), var(--cs-shadow-sm)',
     }}>
       {[120, 80, 200, 160].map((w, i) => (
         <div key={i} style={{
-          height: 14, width: w, borderRadius: 6, marginBottom: 14,
-          background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+          height: 14, width: w, borderRadius: 10, marginBottom: 14,
+          background: 'linear-gradient(90deg, var(--cs-border) 25%, var(--cs-border) 50%, var(--cs-border) 75%)',
           backgroundSize: '200% 100%', 
           animation: 'shimmer 1.4s linear infinite', /* Added 'linear' here for continuous motion */
         }} />
@@ -584,31 +590,31 @@ function SkeletonCard() {
 const labelStyle = {
   display: 'block', fontSize: 11, fontWeight: 700,
   textTransform: 'uppercase', letterSpacing: '0.5px',
-  color: '#555', marginBottom: 5,
+  color: 'var(--cs-text-muted)', marginBottom: 5,
 };
 
 const inputStyle = {
   width: '100%', padding: '8px 12px',
-  border: '1px solid #ddd', borderRadius: 8,
-  fontSize: 13, fontFamily: 'Arial, sans-serif',
+  border: '1px solid var(--cs-border-strong)', borderRadius: 8,
+  fontSize: 13, fontFamily: 'var(--cs-font)',
   outline: 'none', boxSizing: 'border-box',
   transition: 'border-color 0.2s',
 };
 
 const btnPrimary = {
-  padding: '9px 18px', background: '#0504AA', color: '#fff',
+  padding: '9px 18px', background: 'var(--cs-primary)', color: '#fff',
   border: 'none', borderRadius: 8, fontSize: 13,
-  fontWeight: 700, cursor: 'pointer', fontFamily: 'Arial, sans-serif',
+  fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--cs-font)',
 };
 
 const btnSecondary = {
-  padding: '9px 18px', background: 'transparent', color: '#555',
-  border: '2px solid #ccc', borderRadius: 8, fontSize: 13,
-  fontWeight: 600, cursor: 'pointer', fontFamily: 'Arial, sans-serif',
+  padding: '9px 18px', background: 'transparent', color: 'var(--cs-text-muted)',
+  border: '2px solid var(--cs-border-strong)', borderRadius: 8, fontSize: 13,
+  fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--cs-font)',
 };
 
 const btnPage = {
-  padding: '5px 12px', background: '#eef0ff', color: '#0504AA',
-  border: '1px solid #c0c4f7', borderRadius: 6, fontSize: 12,
-  fontWeight: 600, cursor: 'pointer', fontFamily: 'Arial, sans-serif',
+  padding: '5px 12px', background: 'var(--cs-primary-tint)', color: 'var(--cs-primary)',
+  border: '1px solid var(--cs-border-strong)', borderRadius: 10, fontSize: 12,
+  fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--cs-font)',
 };

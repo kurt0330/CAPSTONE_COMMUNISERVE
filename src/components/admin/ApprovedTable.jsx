@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import SPDetailsModal from '@/components/admin/SPDetailsModal';
+import Icon from '@/components/ui/Icon';
 
 export default function ApprovedTable({ onStatsChange }) {
   const [providers,   setProviders]  = useState([]);
@@ -32,6 +33,24 @@ export default function ApprovedTable({ onStatsChange }) {
     fetchApproved(); 
   }, []);
 
+  // ── Real-time listener: Catches newly approved SPs and adds them to the top of the list ──
+  useEffect(() => {
+    const handleNewApproval = (e) => {
+      const { status, record } = e.detail;
+      
+      // If the signal says "Approved" and contains the person's record, add them!
+      if (status === 'Approved' && record) {
+        setProviders(prev => [
+          { ...record, admin_status: 'Approved', updated_at: new Date().toISOString() }, 
+          ...prev
+        ]);
+      }
+    };
+
+    window.addEventListener('sp-status-updated', handleNewApproval);
+    return () => window.removeEventListener('sp-status-updated', handleNewApproval);
+  }, []);
+
   const filtered = providers.filter((sp) => {
     const nameMatch  = sp.full_name?.toLowerCase().includes(search.toLowerCase());
     const tradeMatch = !tradeFilter || sp.trade === tradeFilter;
@@ -45,17 +64,17 @@ export default function ApprovedTable({ onStatsChange }) {
         <div style={{ position: 'relative', flex: 1, maxWidth: 320 }}>
           <span style={{
             position: 'absolute', left: 10, top: '50%',
-            transform: 'translateY(-50%)', color: '#aaa', fontSize: 14,
-          }}>🔍</span>
+            transform: 'translateY(-50%)', color: 'var(--cs-text-soft)', display: 'flex',
+          }}><Icon name="search" size="sm" /></span>
           <input
             type="text"
             placeholder="Search approved SPs…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
-              width: '100%', padding: '8px 12px 8px 32px',
-              border: '1px solid #ddd', borderRadius: 6,
-              fontSize: 13, fontFamily: 'Arial, sans-serif', outline: 'none',
+              width: '100%', boxSizing: 'border-box', padding: '8px 12px 8px 32px',
+              border: '1px solid var(--cs-border-strong)', borderRadius: 10,
+              fontSize: 13, fontFamily: 'var(--cs-font)', outline: 'none',
             }}
           />
         </div>
@@ -65,11 +84,11 @@ export default function ApprovedTable({ onStatsChange }) {
           style={{
             flex: '0 0 240px',             
             padding: '8px 12px',
-            border: '1px solid #ddd',
-            borderRadius: 6, 
+            border: '1px solid var(--cs-border-strong)',
+            borderRadius: 10, 
             fontSize: 13, 
-            fontFamily: 'Arial, sans-serif',
-            color: '#444', 
+            fontFamily: 'var(--cs-font)',
+            color: 'var(--cs-text-muted)', 
             cursor: 'pointer', 
             outline: 'none',
             backgroundColor: '#fff',
@@ -87,13 +106,14 @@ export default function ApprovedTable({ onStatsChange }) {
           type="button"
           onClick={fetchApproved}
           style={{
-            padding: '8px 14px', background: '#eef0ff',
-            border: '1px solid #c0c4f7', borderRadius: 6,
-            fontSize: 13, fontWeight: 600, color: '#0504AA',
+            padding: '8px 14px', background: 'var(--cs-primary-tint)',
+            border: '1px solid var(--cs-border-strong)', borderRadius: 10,
+            fontSize: 13, fontWeight: 600, color: 'var(--cs-primary)',
             cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', gap: 6,
           }}
         >
-          ↻ Refresh
+          <Icon name="refresh" size="sm" /> Refresh
         </button>
       </div>
 
@@ -101,13 +121,13 @@ export default function ApprovedTable({ onStatsChange }) {
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
           <thead>
-            <tr style={{ background: '#f4f6ff' }}>
+            <tr style={{ background: 'var(--cs-bg)' }}>
               {['#', 'Full Name', 'Trade / Skill', 'Barangay', 'Date Approved', 'Rating', 'Actions'].map((h) => (
                 <th key={h} style={{
                   padding: '10px 14px', textAlign: 'left',
-                  color: '#0504AA', fontWeight: 700, fontSize: 12,
+                  color: 'var(--cs-primary)', fontWeight: 700, fontSize: 12,
                   textTransform: 'uppercase', letterSpacing: '0.5px',
-                  borderBottom: '2px solid #dce0f5', whiteSpace: 'nowrap',
+                  borderBottom: '2px solid var(--cs-border)', whiteSpace: 'nowrap',
                 }}>{h}</th>
               ))}
             </tr>
@@ -115,21 +135,23 @@ export default function ApprovedTable({ onStatsChange }) {
           <tbody>
             {loading && <SkeletonRows cols={7} rows={5} />}
             {!loading && error && (
-              <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40, color: '#E24B4A' }}>
-                ⚠ {error}
+              <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40, color: 'var(--cs-danger)' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <Icon name="warning" size="sm" /> {error}
+                </span>
               </td></tr>
             )}
             {!loading && !error && filtered.length === 0 && (
-              <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40, color: '#aaa' }}>
+              <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40, color: 'var(--cs-text-soft)' }}>
                 No approved service providers yet.
               </td></tr>
             )}
             {!loading && !error && filtered.map((sp, idx) => (
-              <tr key={sp.provider_id} style={{ borderBottom: '1px solid #f0f0f0' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#fafbff'}
+              <tr key={sp.provider_id} style={{ borderBottom: '1px solid var(--cs-border)' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--cs-bg)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = ''}
               >
-                <td style={{ padding: '12px 14px', color: '#aaa', fontSize: 12 }}>{idx + 1}</td>
+                <td style={{ padding: '12px 14px', color: 'var(--cs-text-soft)', fontSize: 12 }}>{idx + 1}</td>
                 <td style={{ padding: '12px 14px', fontWeight: 600 }}>{sp.full_name}</td>
                 <td style={{ padding: '12px 14px' }}>
                   <TradePill trade={sp.trade} />
@@ -137,12 +159,15 @@ export default function ApprovedTable({ onStatsChange }) {
                 <td style={{ padding: '12px 14px' }}>{sp.barangay ?? '—'}</td>
                 <td style={{ padding: '12px 14px' }}>{formatDate(sp.date_submitted)}</td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontWeight: 700, color: '#e6a817' }}>
-                    {'★'.repeat(Math.round(sp.average_rating ?? 0))} {sp.average_rating ?? '0.00'}
+                  <span style={{ fontWeight: 700, color: 'var(--cs-text)', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                    {Array.from({ length: Math.round(sp.average_rating ?? 0) }, (_, i) => (
+                      <Icon key={i} name="star" size="xs" style={{ color: 'var(--cs-star)' }} />
+                    ))}
+                    <span style={{ marginLeft: 4 }}>{sp.average_rating ?? '0.00'}</span>
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <ActionBtn label="View" color="#0504AA" onClick={() => setSelected(sp)} />
+                  <ActionBtn label="View" color="var(--cs-primary)" onClick={() => setSelected(sp)} />
                 </td>
               </tr>
             ))}
@@ -174,7 +199,7 @@ function TradePill({ trade }) {
   return (
     <span style={{
       display: 'inline-block',
-      background: '#eef0ff', color: '#0504AA',
+      background: 'var(--cs-primary-tint)', color: 'var(--cs-primary)',
       fontSize: 11, fontWeight: 700,
       padding: '3px 10px', borderRadius: 20, letterSpacing: '0.3px',
     }}>
@@ -191,7 +216,7 @@ function ActionBtn({ label, color, onClick, disabled = false }) {
       disabled={disabled}
       style={{
         background: color, color: '#fff', border: 'none',
-        padding: '5px 13px', borderRadius: 5,
+        padding: '5px 13px', borderRadius: 8,
         fontSize: 12, fontWeight: 600, cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.4 : 1, transition: 'opacity 0.2s',
       }}
@@ -208,7 +233,7 @@ function SkeletonRows({ cols, rows }) {
         <td key={j} style={{ padding: '14px 14px' }}>
           <div style={{
             height: 14, borderRadius: 4,
-            background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+            background: 'linear-gradient(90deg, var(--cs-border) 25%, var(--cs-border) 50%, var(--cs-border) 75%)',
             backgroundSize: '200% 100%',
             animation: 'shimmer 1.4s infinite',
           }} />

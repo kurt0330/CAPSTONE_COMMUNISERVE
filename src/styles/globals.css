@@ -45,6 +45,125 @@ body {
   --sp-speed:     0.22s;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   COMMUNISERVE DESIGN SYSTEM (v2) — tokens
+   Light gray canvas, white rounded cards, vibrant blue primary.
+   Consumed by the customer/provider portals (app-shell.css) and the
+   admin reskin. The --sp-* tokens above stay as-is for the provider
+   registration form, landing page and login page.
+   ══════════════════════════════════════════════════════════════════ */
+:root {
+  --cs-primary:        #0066FF;
+  --cs-primary-hover:  #0052CC;
+  --cs-primary-tint:   #EAF2FF;
+  --cs-primary-ring:   rgba(0, 102, 255, 0.18);
+
+  --cs-bg:             #F8F9FA;
+  --cs-surface:        #FFFFFF;
+  --cs-surface-muted:  #F1F3F5;
+  --cs-border:         #E9ECEF;
+  --cs-border-strong:  #DEE2E6;
+
+  --cs-text:           #111827;
+  --cs-text-muted:     #6B7280;
+  --cs-text-soft:      #9CA3AF;
+
+  --cs-success:        #16A34A;
+  --cs-success-tint:   #E7F6EC;
+  --cs-warning:        #D97706;
+  --cs-warning-tint:   #FEF3E2;
+  --cs-danger:         #E5484D;
+  --cs-danger-tint:    #FDECEC;
+  --cs-star:           #0066FF;
+
+  --cs-radius-sm:      8px;
+  --cs-radius:         12px;
+  --cs-radius-lg:      16px;
+  --cs-radius-pill:    999px;
+
+  --cs-shadow-sm:      0 1px 2px rgba(16, 24, 40, 0.05);
+  --cs-shadow:         0 1px 2px rgba(16, 24, 40, 0.04), 0 6px 20px rgba(16, 24, 40, 0.06);
+  --cs-shadow-lg:      0 12px 32px rgba(16, 24, 40, 0.12);
+
+  /* System font stack: no web-font download on slow rural data. */
+  --cs-font:           -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --cs-speed:          0.2s;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ICON SYSTEM
+   <Icon name="search" size="md" /> renders
+     <span class="icon icon-md" style="--icon-src: url(/assets/icons/search.svg)">
+   The file is used as a CSS mask, so the icon takes the text colour
+   (currentColor) and recolours with hover/active states. Drop a
+   monochrome Flaticon SVG/PNG into /public/assets/icons/ with the same
+   file name to replace a placeholder. For a full-colour Flaticon asset,
+   add the icon--color modifier (renders the file as-is, no tint).
+   ══════════════════════════════════════════════════════════════════ */
+.icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  background-color: currentColor;
+  -webkit-mask: var(--icon-src) center / contain no-repeat;
+          mask: var(--icon-src) center / contain no-repeat;
+}
+
+.icon--color {
+  background: var(--icon-src) center / contain no-repeat;
+  -webkit-mask: none;
+          mask: none;
+}
+
+.icon-xs { width: 12px; height: 12px; }
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 20px; height: 20px; }
+.icon-lg { width: 24px; height: 24px; }
+.icon-xl { width: 32px; height: 32px; }
+.icon-2xl { width: 44px; height: 44px; }
+
+/* Rounded tinted square that holds an icon (stat tiles, list rows). */
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--cs-radius);
+  background: var(--cs-primary-tint);
+  color: var(--cs-primary);
+}
+
+.icon-badge--sm { width: 32px; height: 32px; border-radius: 10px; }
+.icon-badge--lg { width: 56px; height: 56px; border-radius: var(--cs-radius-lg); }
+.icon-badge--round { border-radius: 50%; }
+.icon-badge--success { background: var(--cs-success-tint); color: var(--cs-success); }
+.icon-badge--warning { background: var(--cs-warning-tint); color: var(--cs-warning); }
+.icon-badge--danger  { background: var(--cs-danger-tint);  color: var(--cs-danger); }
+.icon-badge--neutral { background: var(--cs-surface-muted); color: var(--cs-text-muted); }
+
+/* Inline icon + text pairing inside buttons, labels and meta rows. */
+.icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Small status dot (replaces coloured-circle emoji). */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cs-text-soft);
+  flex-shrink: 0;
+}
+
+.status-dot--on { background: var(--cs-success); }
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }

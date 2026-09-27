@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import Icon from '@/components/ui/Icon';
 import { useRouter } from 'next/navigation';
 
 export default function ProviderOnboardingPage() {
@@ -20,7 +21,7 @@ export default function ProviderOnboardingPage() {
   // ── Strength indicator helper ─────────────────────────────────────────
   function passwordStrength(pwd) {
     if (!pwd) return null;
-    if (pwd.length < 8) return { label: 'Too short', color: '#E24B4A', width: '25%' };
+    if (pwd.length < 8) return { label: 'Too short', color: 'var(--cs-danger)', width: '25%' };
     
     const hasUpper  = /[A-Z]/.test(pwd);
     const hasLower  = /[a-z]/.test(pwd);
@@ -29,10 +30,10 @@ export default function ProviderOnboardingPage() {
     
     const score = [hasUpper, hasLower, hasNumber, hasSymbol].filter(Boolean).length;
     
-    if (score <= 1) return { label: 'Weak',   color: '#E24B4A', width: '25%' };
-    if (score === 2) return { label: 'Fair',   color: '#e6a817', width: '50%' };
-    if (score === 3) return { label: 'Good',   color: '#1D9E75', width: '75%' };
-    return                   { label: 'Strong', color: '#0504AA', width: '100%' };
+    if (score <= 1) return { label: 'Weak',   color: 'var(--cs-danger)', width: '25%' };
+    if (score === 2) return { label: 'Fair',   color: 'var(--cs-warning)', width: '50%' };
+    if (score === 3) return { label: 'Good',   color: 'var(--cs-success)', width: '75%' };
+    return                   { label: 'Strong', color: 'var(--cs-primary)', width: '100%' };
   }
 
   const strength = passwordStrength(newPassword);
@@ -93,13 +94,13 @@ export default function ProviderOnboardingPage() {
   // ── STEP 1: Welcome Screen ──
   if (step === 1) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', fontFamily: 'Arial, sans-serif', padding: 24 }}>
-        <div style={{ background: '#fff', borderRadius: 12, padding: '40px 44px', width: '100%', maxWidth: 500, boxShadow: '0 4px 24px rgba(0,0,0,0.10)', textAlign: 'center' }}>
-          <div style={{ fontSize: 52, marginBottom: 20 }}>🎉</div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0504AA', margin: '0 0 10px' }}>Welcome to CommuniServe!</h1>
-          <p style={{ fontSize: 14, color: '#555', lineHeight: 1.7, margin: '0 0 28px' }}>Your service provider application has been approved by the PESO Office of Anini-y. Before you access your dashboard, you need to complete a quick one-time account setup.</p>
-          <button onClick={() => setStep(2)} style={{ width: '100%', padding: '13px', background: '#0504AA', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
-            Set Up My Account →
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--cs-bg)', fontFamily: 'var(--cs-font)', padding: 24 }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: '40px 44px', width: '100%', maxWidth: 500, boxShadow: '0 0 0 1px var(--cs-border), var(--cs-shadow)', textAlign: 'center' }}>
+          <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}><span className="icon-badge icon-badge--lg"><Icon name="shield-check" size="xl" /></span></div>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--cs-primary)', margin: '0 0 10px' }}>Welcome to CommuniServe!</h1>
+          <p style={{ fontSize: 14, color: 'var(--cs-text-muted)', lineHeight: 1.7, margin: '0 0 28px' }}>Your service provider application has been approved by the PESO Office of Anini-y. Before you access your dashboard, you need to complete a quick one-time account setup.</p>
+          <button onClick={() => setStep(2)} style={{ width: '100%', padding: '13px', background: 'var(--cs-primary)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+            Set Up My Account <Icon name="arrow-right" size="sm" />
           </button>
         </div>
       </div>
@@ -109,20 +110,20 @@ export default function ProviderOnboardingPage() {
   // ── STEP 2: Password Change Form ──
   if (step === 2) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', fontFamily: 'Arial, sans-serif', padding: 24 }}>
-        <div style={{ background: '#fff', borderRadius: 12, padding: '36px 40px', width: '100%', maxWidth: 440, boxShadow: '0 4px 24px rgba(0,0,0,0.10)' }}>
-          <h3 style={{ margin: '0 0 6px', fontSize: 18, fontWeight: 700, color: '#111' }}>Set Your Permanent Password</h3>
-          <p style={{ fontSize: 13, color: '#777', margin: '0 0 20px' }}>Your temporary password will no longer work after this step.</p>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--cs-bg)', fontFamily: 'var(--cs-font)', padding: 24 }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: '36px 40px', width: '100%', maxWidth: 440, boxShadow: '0 0 0 1px var(--cs-border), var(--cs-shadow)' }}>
+          <h3 style={{ margin: '0 0 6px', fontSize: 18, fontWeight: 700, color: 'var(--cs-text)' }}>Set Your Permanent Password</h3>
+          <p style={{ fontSize: 13, color: 'var(--cs-text-muted)', margin: '0 0 20px' }}>Your temporary password will no longer work after this step.</p>
           
-          {error && <div style={{ background: '#fff5f5', border: '1.5px solid #E24B4A', borderRadius: 8, padding: '10px 14px', marginBottom: 18, fontSize: 13, color: '#E24B4A', fontWeight: 600 }}>⚠ {error}</div>}
+          {error && <div style={{ background: 'var(--cs-danger-tint)', border: '1.5px solid var(--cs-danger)', borderRadius: 8, padding: '10px 14px', marginBottom: 18, fontSize: 13, color: 'var(--cs-danger)', fontWeight: 600 }}><Icon name="warning" size="sm" style={{ marginRight: 6 }} />{error}</div>}
 
           <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             
             {/* New Password Input Row */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: '#333' }}>NEW PASSWORD</label>
-                <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ background: 'none', border: 'none', color: '#0504AA', fontSize: 12, fontWeight: 600, cursor: 'pointer', padding: 0 }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--cs-text)' }}>NEW PASSWORD</label>
+                <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ background: 'none', border: 'none', color: 'var(--cs-primary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', padding: 0 }}>
                   {showPwd ? 'Hide' : 'Show'}
                 </button>
               </div>
@@ -131,20 +132,20 @@ export default function ProviderOnboardingPage() {
                 value={newPassword} 
                 onChange={(e) => setNewPassword(e.target.value)} 
                 required 
-                style={{ padding: '10px 14px', border: '1px solid #ddd', borderRadius: 8, fontSize: 14 }} 
+                style={{ padding: '10px 14px', border: '1px solid var(--cs-border-strong)', borderRadius: 8, fontSize: 14 }} 
               />
               
               {/* Dynamic Strength Bar Graphic */}
               {strength && (
                 <div style={{ marginTop: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-                    <span style={{ color: '#777' }}>Password Security:</span>
+                    <span style={{ color: 'var(--cs-text-muted)' }}>Password Security:</span>
                     <span style={{ color: strength.color, fontWeight: 700 }}>{strength.label}</span>
                   </div>
-                  <div style={{ width: '100%', height: 6, background: '#e0e0e0', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: 6, background: 'var(--cs-border)', borderRadius: 3, overflow: 'hidden' }}>
                     <div style={{ width: strength.width, height: '100%', background: strength.color, transition: 'width 0.3s ease-in-out' }} />
                   </div>
-                  <p style={{ margin: '6px 0 0', fontSize: 11, color: '#888', lineHeight: 1.4 }}>
+                  <p style={{ margin: '6px 0 0', fontSize: 11, color: 'var(--cs-text-muted)', lineHeight: 1.4 }}>
                     Must have 8+ characters with uppercase, lowercase, numbers, and symbols.
                   </p>
                 </div>
@@ -153,18 +154,18 @@ export default function ProviderOnboardingPage() {
 
             {/* Confirm Password Input Row */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#333' }}>CONFIRM NEW PASSWORD</label>
+              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--cs-text)' }}>CONFIRM NEW PASSWORD</label>
               <input 
                 type={showPwd ? 'text' : 'password'} 
                 value={confirm} 
                 onChange={(e) => setConfirm(e.target.value)} 
                 required 
-                style={{ padding: '10px 14px', border: '1px solid #ddd', borderRadius: 8, fontSize: 14 }} 
+                style={{ padding: '10px 14px', border: '1px solid var(--cs-border-strong)', borderRadius: 8, fontSize: 14 }} 
               />
             </div>
 
-            <button type="submit" disabled={loading} style={{ marginTop: 8, padding: '13px', background: loading ? '#999' : '#1D9E75', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer' }}>
-              {loading ? 'Saving...' : 'Confirm Password & Enter Dashboard →'}
+            <button type="submit" disabled={loading} style={{ marginTop: 8, padding: '13px', background: loading ? '#999' : 'var(--cs-primary)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer' }}>
+              {loading ? 'Saving...' : <>Confirm Password &amp; Enter Dashboard <Icon name="arrow-right" size="sm" /></>}
             </button>
           </form>
         </div>
@@ -175,11 +176,11 @@ export default function ProviderOnboardingPage() {
   // ── STEP 3: Success Screen ──
   if (step === 3) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', fontFamily: 'Arial, sans-serif' }}>
-        <div style={{ background: '#fff', borderRadius: 12, padding: '48px 44px', textAlign: 'center', boxShadow: '0 4px 24px rgba(0,0,0,0.10)' }}>
-          <div style={{ fontSize: 40, margin: '0 auto 20px' }}>✅</div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1D9E75', margin: '0 0 10px' }}>Account Setup Complete!</h2>
-          <p style={{ fontSize: 14, color: '#777' }}>Redirecting to your dashboard...</p>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--cs-bg)', fontFamily: 'var(--cs-font)' }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: '48px 44px', textAlign: 'center', boxShadow: '0 0 0 1px var(--cs-border), var(--cs-shadow)' }}>
+          <div style={{ margin: '0 auto 20px', display: 'flex', justifyContent: 'center' }}><span className="icon-badge icon-badge--lg icon-badge--success"><Icon name="check-circle" size="xl" /></span></div>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--cs-success)', margin: '0 0 10px' }}>Account Setup Complete!</h2>
+          <p style={{ fontSize: 14, color: 'var(--cs-text-muted)' }}>Redirecting to your dashboard...</p>
         </div>
       </div>
     );

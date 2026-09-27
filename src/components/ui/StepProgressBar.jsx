@@ -4,6 +4,8 @@
 //   currentStep: number (1-5)
 //   completedSteps: number[] (e.g. [1, 2])
 
+import Icon from '@/components/ui/Icon';
+
 const STEPS = [
   { num: 1, label: 'Personal\nInformation' },
   { num: 2, label: 'Professional\nProfile' },
@@ -16,7 +18,7 @@ export default function StepProgressBar({ currentStep, completedSteps = [] }) {
   return (
     <div className="step-progress-wrapper">
       <div className="main-circle" id="stepCircle">
-        {completedSteps.length === 5 ? '✓' : currentStep}
+        {completedSteps.length === 5 ? <Icon name="check" size="md" /> : currentStep}
       </div>
       <div className="segmented-bar">
         {STEPS.map(({ num, label }) => {

@@ -5,6 +5,7 @@
 'use client';
 
 import Image from 'next/image';
+import Icon from '@/components/ui/Icon';
 import { useAddressSync } from '@/hooks/useAddressSync';
 
 export default function Step1Personal({ fields, setFields, children }) {
@@ -56,11 +57,11 @@ export default function Step1Personal({ fields, setFields, children }) {
 
   // ── Socio-economic cards config ───────────────────────────────
   const SOCIO = [
-    { key: 'is_4ps_beneficiary', icon: '🏠', label: '4Ps Beneficiary',       sub: 'Pantawid Pamilyang Pilipino Program' },
-    { key: 'is_indigent',        icon: '📋', label: 'Indigent',               sub: 'Registered indigent household' },
-    { key: 'is_pwd',             icon: '♿', label: 'Person with Disability', sub: 'PWD card holder' },
-    { key: 'is_senior_citizen',  icon: '👴', label: 'Senior Citizen',         sub: '60 years old and above' },
-    { key: 'is_solo_parent',     icon: '👨‍👧', label: 'Solo Parent',           sub: 'Solo parent card holder' },
+    { key: 'is_4ps_beneficiary', icon: 'home',          label: '4Ps Beneficiary',       sub: 'Pantawid Pamilyang Pilipino Program' },
+    { key: 'is_indigent',        icon: 'clipboard',     label: 'Indigent',               sub: 'Registered indigent household' },
+    { key: 'is_pwd',             icon: 'accessibility', label: 'Person with Disability', sub: 'PWD card holder' },
+    { key: 'is_senior_citizen',  icon: 'senior',        label: 'Senior Citizen',         sub: '60 years old and above' },
+    { key: 'is_solo_parent',     icon: 'family',        label: 'Solo Parent',           sub: 'Solo parent card holder' },
   ];
 
   return (
@@ -366,7 +367,9 @@ export default function Step1Personal({ fields, setFields, children }) {
                   : { borderTop: '3px solid transparent' }
               }
             >
-              <span className="socio-icon">{icon}</span>
+              <span className="socio-icon" style={{ color: 'var(--sp-blue)' }}>
+                <Icon name={icon} size="lg" />
+              </span>
               <strong>{label}</strong>
               <small>{sub}</small>
             </div>

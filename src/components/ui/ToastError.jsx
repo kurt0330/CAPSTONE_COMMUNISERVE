@@ -2,6 +2,7 @@
 // Simple toast component for displaying error messages in a non-intrusive way.
 // Usage: <ToastError message="Your error message here" />// PATH: /src/components/ui/ToastError.jsx
 'use client';
+import Icon from '@/components/ui/Icon';
 
 export default function ToastError({ message }) {
   if (!message) return null; // Don't render if there's no error
@@ -30,7 +31,7 @@ export default function ToastError({ message }) {
 
   return (
     <div style={styles.toastContainer}>
-      <span style={{ fontSize: '20px' }}>⚠️</span>
+      <Icon name="warning" size="md" />
       <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>{message}</p>
     </div>
   );
