@@ -1,0 +1,341 @@
+/* PATH: /src/styles/register-customer.css
+   Customer signup + OTP verification (M2).
+
+   Imported directly by src/components/customer/RegisterForm.jsx, which is
+   rendered only at /register/customer — so these styles do not reach admin,
+   provider or portal routes.
+
+   Replaces that component's inline style objects, which could not express
+   media queries. Mobile-first; tokens come from globals.css :root.
+   Only the presentation changed — the OTP/Supabase logic is untouched.
+*/
+
+.rc-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  font-family: Arial, sans-serif;
+  padding: 28px 16px;
+  box-sizing: border-box;
+}
+
+/* ── Branding ── */
+
+.rc-brand {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.rc-brand-title {
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--sp-blue);
+  letter-spacing: 1.5px;
+  margin: 0 0 4px;
+}
+
+.rc-brand-sub {
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Card ── */
+
+.rc-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 26px 20px;
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+}
+
+.rc-card--narrow {
+  max-width: 420px;
+  text-align: center;
+}
+
+.rc-card--center {
+  text-align: center;
+}
+
+.rc-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 6px;
+}
+
+.rc-card-title--success {
+  color: var(--sp-teal);
+}
+
+.rc-card-sub {
+  font-size: 13px;
+  color: #777;
+  margin: 0 0 22px;
+  line-height: 1.6;
+}
+
+.rc-email {
+  color: var(--sp-blue);
+}
+
+.rc-note {
+  font-size: 12px;
+  color: #aaa;
+  margin: 0 0 22px;
+  line-height: 1.5;
+}
+
+/* ── Form ── */
+
+.rc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rc-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+.rc-req {
+  color: var(--sp-red);
+  font-weight: 700;
+}
+
+.rc-input {
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  /* 16px keeps iOS from zooming the viewport when a field takes focus. */
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color var(--sp-speed);
+  background: #fff;
+  min-height: 46px;
+}
+
+.rc-input:focus {
+  border-color: var(--sp-blue);
+}
+
+.rc-input--select {
+  cursor: pointer;
+}
+
+.rc-input--ok {
+  border-color: var(--sp-teal);
+}
+
+.rc-input--err {
+  border-color: var(--sp-red);
+}
+
+.rc-input--otp {
+  font-size: 22px;
+  text-align: center;
+  letter-spacing: 8px;
+  font-weight: 700;
+}
+
+.rc-pwd-wrap {
+  position: relative;
+}
+
+.rc-pwd-wrap .rc-input {
+  padding-right: 46px;
+}
+
+.rc-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  color: #aaa;
+  padding: 6px;
+  line-height: 1;
+}
+
+.rc-match-ok,
+.rc-match-err {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+  display: block;
+  text-align: left;
+}
+
+.rc-match-ok  { color: var(--sp-teal); }
+.rc-match-err { color: var(--sp-red); }
+
+/* ── Buttons ── */
+
+.rc-submit {
+  margin-top: 6px;
+  padding: 14px;
+  color: #fff;
+  background: var(--sp-blue);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  transition: background var(--sp-speed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 50px;
+}
+
+.rc-submit--verify {
+  background: var(--sp-teal);
+}
+
+.rc-submit:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.rc-resend {
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: var(--sp-blue);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: Arial, sans-serif;
+  padding: 8px;
+  min-height: 40px;
+}
+
+.rc-textbtn {
+  background: none;
+  border: none;
+  color: var(--sp-blue);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: Arial, sans-serif;
+  padding: 2px 4px;
+}
+
+/* ── Banners ── */
+
+.rc-error {
+  background: #fff5f5;
+  border: 1.5px solid var(--sp-red);
+  border-radius: 8px;
+  padding: 11px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--sp-red);
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.rc-resent {
+  background: var(--sp-teal-tint);
+  border: 1px solid var(--sp-teal);
+  border-radius: 8px;
+  padding: 9px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: var(--sp-teal);
+  font-weight: 600;
+}
+
+/* ── Misc ── */
+
+.rc-otp-icon {
+  font-size: 44px;
+  margin-bottom: 14px;
+}
+
+.rc-done-icon {
+  font-size: 50px;
+  margin-bottom: 16px;
+}
+
+.rc-loading-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.rc-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;  /* keyframes live in globals.css */
+}
+
+.rc-switch {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #aaa;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.rc-link {
+  color: var(--sp-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.rc-link:hover {
+  text-decoration: underline;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ≥ 480px — roomier card once there's width to spare
+   ══════════════════════════════════════════════════════════ */
+
+@media (min-width: 480px) {
+  .rc-wrap        { padding: 40px 24px; }
+  .rc-card        { padding: 36px 40px; }
+  .rc-brand-title { font-size: 28px; }
+  .rc-input--otp  { letter-spacing: 10px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ≥ 768px
+   ══════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  .rc-brand { margin-bottom: 28px; }
+  .rc-form  { gap: 18px; }
+}

@@ -4,7 +4,8 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Icon from '@/components/ui/Icon';
 import MainHeader        from '@/components/ui/MainHeader';
 import StepProgressBar   from '@/components/ui/StepProgressBar';
 import Step1Personal     from '@/components/registration/Step1Personal';
@@ -65,14 +66,14 @@ const INITIAL_FIELDS = {
   assessment_started_at: null,
   assessment_skipped:    false,
   // step 5
+  // provider_identity.national_id_pin — PIN only, no ID photo (§0.1 D-1 / BR-17)
+  national_id_pin:      '',
   terms_agreed:         false,
 };
 
 const INITIAL_FILES = {
-  file_national_id:      null,
-  file_national_id_back: null,
-  file_photo:            null,
-  file_certificate:      null,
+  file_photo:       null,
+  file_certificate: null,
 };
 
 // ── Full linear navigation map including Step 4 ──────────────────────────────
@@ -88,6 +89,29 @@ export default function ProviderRegistrationPage() {
   const [files,           setFiles]        = useState(INITIAL_FILES);
 
   const { validateStep } = useStepValidation();
+
+  // ── offline persistence: Load/Hydrate data from localStorage on Mount ──
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedFields = localStorage.getItem('communiserve_registration_fields');
+      if (savedFields) {
+        try {
+          const parsed = JSON.parse(savedFields);
+          // Merge with initial fields to prevent errors if keys change down the line
+          setFields((prev) => ({ ...prev, ...parsed }));
+        } catch (e) {
+          console.error('[CommuniServe] Error parsing cached registration fields:', e);
+        }
+      }
+    }
+  }, []);
+
+  // ── offline persistence: Synchronize changes to localStorage immediately ──
+  useEffect(() => {
+    if (typeof window !== 'undefined' && fields !== INITIAL_FIELDS) {
+      localStorage.setItem('communiserve_registration_fields', JSON.stringify(fields));
+    }
+  }, [fields]);
 
   // ── Toast ─────────────────────────────────────────────────────────────
   function showToast(msg, type = 'error') {
@@ -165,6 +189,10 @@ export default function ProviderRegistrationPage() {
 
       if (result.success) {
         setCompleted([1, 2, 3, 4, 5]);
+        // ── offline persistence: Clean up browser storage on successful creation ──
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('communiserve_registration_fields');
+        }
       } else {
         showToast(result.errors?.[0] ?? 'Submission failed. Please try again.');
       }
@@ -195,7 +223,7 @@ export default function ProviderRegistrationPage() {
               : undefined
           }
         >
-          {toast.type === 'error' ? '⚠ ' : '✓ '}
+          <Icon name={toast.type === 'error' ? 'warning' : 'check'} size="sm" style={{ marginRight: 6 }} />
           {toast.msg}
         </div>
       )}
@@ -253,7 +281,7 @@ export default function ProviderRegistrationPage() {
               showNext={false}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
-              submitLabel={isSubmitting ? 'Submitting…' : 'Submit Registration ✓'}
+              submitLabel={isSubmitting ? 'Submitting…' : <>Submit Registration <Icon name="check" size="sm" /></>}
             />
           </Step5Files>
         )}
@@ -282,7 +310,7 @@ function NavRow({
   onBack,
   showNext     = true,
   onNext,
-  nextLabel    = 'Next ›',
+  nextLabel    = 'Next',
   onSubmit,
   submitLabel,
   isSubmitting = false,
@@ -293,7 +321,7 @@ function NavRow({
       {showBack
         ? (
           <button type="button" className="btn-back" onClick={onBack}>
-            ‹ Back
+            <Icon name="chevron-left" size="sm" /> Back
           </button>
         )
         : <div />}
@@ -301,7 +329,7 @@ function NavRow({
       {/* Right slot: Next OR Submit */}
       {showNext && onNext && (
         <button type="button" className="btn-next" onClick={onNext}>
-          {nextLabel}
+          {nextLabel} <Icon name="chevron-right" size="sm" />
         </button>
       )}
       {onSubmit && (
@@ -332,7 +360,7 @@ function SuccessBanner({ providerId }) {
   return (
     <div className="page-container step-panel">
       <div className="submit-success">
-        <div className="success-circle">✓</div>
+        <div className="success-circle"><Icon name="check" size="xl" /></div>
         <h2>Application Submitted!</h2>
         <p>
           Your registration has been received by the PESO Office.
@@ -354,7 +382,7 @@ function SuccessBanner({ providerId }) {
               display: 'inline-block',
             }}
           >
-            ✓ Application successfully submitted! Approval typically takes 1–2 weeks—please watch your email for an official notice of your results.
+            <Icon name="check-circle" size="sm" style={{ marginRight: 6 }} />Application successfully submitted! Approval typically takes 1–2 weeks—please watch your email for an official notice of your results.
           </div>
         )}
 
@@ -364,7 +392,7 @@ function SuccessBanner({ providerId }) {
             className="btn-next"
             style={{ display: 'inline-block', textDecoration: 'none' }}
           >
-            Go to Login ›
+            Go to Login <Icon name="chevron-right" size="sm" />
           </a>
           <button
             type="button"
@@ -398,7 +426,7 @@ function ErrorDetailPanel({ errors = [] }) {
       }}
     >
       <p style={{ margin: '0 0 8px', fontWeight: 700, color: 'var(--sp-red)', fontSize: 13 }}>
-        ⚠ Submission returned errors — check these before re-testing:
+        <Icon name="warning" size="sm" style={{ marginRight: 6 }} />Submission returned errors — check these before re-testing:
       </p>
       <ul style={{ margin: 0, paddingLeft: 18 }}>
         {errors.map((e, i) => (

@@ -2,8 +2,8 @@
 'use server';
 
 import { createServerClient } from '@/lib/supabase/server';
-import { createClient } from '@supabase/supabase-js'; // ADDED for service role
-import { Resend } from 'resend';                      // ADDED for emails
+import { createClient } from '@supabase/supabase-js'; 
+import { Resend } from 'resend';                     
 
 // ── Service role client for Auth admin operations (Bypasses RLS securely) ──
 function adminSupabase() {
@@ -21,7 +21,7 @@ function adminSupabase() {
 
 // ── Shared auth check ─────────────────────────────────────────────────────
 async function assertAdmin(supabase) {
-  // Upgraded to getUser() for strict security in Next.js 15
+  
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) throw new Error('Unauthorized');
 

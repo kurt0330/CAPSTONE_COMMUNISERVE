@@ -2,14 +2,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Icon from '@/components/ui/Icon';
 
-const BATCH_SIZE = 10; // Exactly 10 questions per view page
+const BATCH_SIZE = 10; 
 
 export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
-  const [phase, setPhase] = useState('loading'); // loading | error | ready | taking
+  const [phase, setPhase] = useState('loading'); 
   const [test, setTest] = useState(null);
   const [error, setError] = useState(null);
-  const [answers, setAnswers] = useState({}); // Local state tracking: { [question_id]: choice_id }
+  const [answers, setAnswers] = useState({}); 
   const [batch, setBatch] = useState(0);
   const [startedAt, setStartedAt] = useState(null);
 
@@ -19,7 +20,7 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
   useEffect(() => {
     if (!trade) return;
     setPhase('loading');
-    fetch(`/api/assessments/${trade}`)
+    fetch(`/api/assessments/${trade}`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((json) => {
         if (json.status === 'success') {
@@ -76,11 +77,11 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
     return (
       <div className="page-container step-panel" id="step-4">
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#888' }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
+          <div style={{ marginBottom: 12, color: 'var(--sp-blue)' }}><Icon name="hourglass" size="2xl" /></div>
           <p>Loading {trade} assessment template…</p>
         </div>
         <div className="nav-row">
-          <button type="button" className="btn-back" onClick={onBack}>‹ Back</button>
+          <button type="button" className="btn-back" onClick={onBack}><Icon name="chevron-left" size="sm" /> Back</button>
           <div />
         </div>
       </div>
@@ -91,7 +92,7 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
     return (
       <div className="page-container step-panel" id="step-4">
         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
+          <div style={{ marginBottom: 12, color: 'var(--sp-amber)' }}><Icon name="warning" size="2xl" /></div>
           <p style={{ color: '#E24B4A', fontWeight: 600 }}>{error ?? 'No active test template found.'}</p>
           <p style={{ fontSize: 13, color: '#888' }}>
             The PESO Office has not yet published an assessment workflow configuration for{' '}
@@ -103,11 +104,11 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
             style={{ marginTop: 16 }}
             onClick={handleSkip}
           >
-            Continue to File Submission ›
+            Continue to File Submission <Icon name="chevron-right" size="sm" />
           </button>
         </div>
         <div className="nav-row">
-          <button type="button" className="btn-back" onClick={onBack}>‹ Back</button>
+          <button type="button" className="btn-back" onClick={onBack}><Icon name="chevron-left" size="sm" /> Back</button>
           <div />
         </div>
       </div>
@@ -119,7 +120,7 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
       <div className="page-container step-panel" id="step-4">
         <div className="section-header"><strong>COMPETENCY ASSESSMENT</strong></div>
         <div className="assessment-block">
-          <div className="assessment-icon">📋</div>
+          <div className="assessment-icon" style={{ color: 'var(--sp-blue)' }}><Icon name="clipboard" size="2xl" /></div>
           <h2 className="assessment-title">{test.test_title}</h2>
           <p className="assessment-body">
             This basic competence review runs in parallel with your trade selection as an/a{' '}
@@ -129,21 +130,21 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
 
           <div className="assessment-info-strip">
             <div className="ainfo-item">
-              <span className="ainfo-icon">❓</span>
+              <span className="ainfo-icon" style={{ color: 'var(--sp-blue)', display: 'flex' }}><Icon name="help" size="md" /></span>
               <div>
                 <strong>Total Items</strong>
                 <small>{questions.length} questions</small>
               </div>
             </div>
             <div className="ainfo-item">
-              <span className="ainfo-icon">📄</span>
+              <span className="ainfo-icon" style={{ color: 'var(--sp-blue)', display: 'flex' }}><Icon name="file" size="md" /></span>
               <div>
                 <strong>Layout Engine</strong>
                 <small>{BATCH_SIZE} items / page</small>
               </div>
             </div>
             <div className="ainfo-item">
-              <span className="ainfo-icon">✅</span>
+              <span className="ainfo-icon" style={{ color: 'var(--sp-blue)', display: 'flex' }}><Icon name="check-circle" size="md" /></span>
               <div>
                 <strong>Passing Matrix</strong>
                 <small>{test.passing_score}% Margin</small>
@@ -152,11 +153,11 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
           </div>
 
           <button type="button" className="btn-start-test" onClick={startExam}>
-            Start Assessment ›
+            Start Assessment <Icon name="chevron-right" size="sm" />
           </button>
         </div>
         <div className="nav-row">
-          <button type="button" className="btn-back" onClick={onBack}>‹ Back</button>
+          <button type="button" className="btn-back" onClick={onBack}><Icon name="chevron-left" size="sm" /> Back</button>
           <div />
         </div>
       </div>
@@ -243,7 +244,7 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
               }
             }}
           >
-            ‹ Previous
+            <Icon name="chevron-left" size="sm" /> Previous
           </button>
 
           <span style={{ fontSize: 12, color: '#aaa' }}>
@@ -252,7 +253,7 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
 
           {isLastBatch ? (
             <button type="button" className="btn-next" onClick={handleFinish}>
-              Next: Attachments ›
+              Next: Attachments <Icon name="chevron-right" size="sm" />
             </button>
           ) : (
             <button
@@ -263,7 +264,7 @@ export default function Step4Assessment({ fields, setFields, onNext, onBack }) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             >
-              Next Page ›
+              Next Page <Icon name="chevron-right" size="sm" />
             </button>
           )}
         </div>

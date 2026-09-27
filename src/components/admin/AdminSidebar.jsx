@@ -3,13 +3,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Icon from '@/components/ui/Icon';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard',        href: '/admin/dashboard',    icon: '📊' },
-  { label: 'Service Providers',href: '/admin/providers',    icon: '👥' },
-  { label: 'Skill Assessments',href: '/admin/assessments',  icon: '📋' },
+  { label: 'Dashboard',        href: '/admin/dashboard',    icon: 'dashboard' },
+  { label: 'Service Providers',href: '/admin/providers',    icon: 'users' },
+  { label: 'Skill Assessments',href: '/admin/assessments',  icon: 'clipboard' },
   // ── Removed Clients nav item here as Admin only manages service providers ──
-  { label: 'Settings',         href: '/admin/settings',     icon: '⚙️' },
+  { label: 'Settings',         href: '/admin/settings',     icon: 'settings' },
 ];
 
 export default function AdminSidebar() {
@@ -19,7 +20,7 @@ export default function AdminSidebar() {
     <aside style={{
       width: 230, flexShrink: 0,
       background: '#fff',
-      borderRight: '1px solid #e0e0e0',
+      borderRight: '1px solid var(--cs-border)',
       padding: '24px 0',
       position: 'sticky',
       top: 90,
@@ -29,7 +30,7 @@ export default function AdminSidebar() {
 
       <p style={{
         fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-        letterSpacing: '1.2px', color: '#aaa',
+        letterSpacing: '1.2px', color: 'var(--cs-text-soft)',
         padding: '0 22px 6px', margin: '0 0 8px',
       }}>
         Navigation
@@ -46,13 +47,13 @@ export default function AdminSidebar() {
               padding:        '10px 22px',
               fontSize:       13.5,
               fontWeight:     600,
-              color:          isActive ? '#0504AA' : '#444',
+              color:          isActive ? 'var(--cs-primary)' : 'var(--cs-text-muted)',
               textDecoration: 'none',
-              borderLeft:     isActive ? '3px solid #0504AA' : '3px solid transparent',
-              background:     isActive ? '#eef0ff' : 'transparent',
+              borderLeft:     isActive ? '3px solid var(--cs-primary)' : '3px solid transparent',
+              background:     isActive ? 'var(--cs-primary-tint)' : 'transparent',
               transition:     'all 0.2s',
             }}>
-              <span style={{ fontSize: 16, width: 18, textAlign: 'center' }}>{icon}</span>
+              <span style={{ display: 'flex', justifyContent: 'center', width: 18 }}><Icon name={icon} size="sm" /></span>
               {label}
             </Link>
           );
@@ -61,7 +62,7 @@ export default function AdminSidebar() {
 
       <p style={{
         fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-        letterSpacing: '1.2px', color: '#aaa',
+        letterSpacing: '1.2px', color: 'var(--cs-text-soft)',
         padding: '0 22px 6px', margin: '24px 0 0',
       }}>
         System
@@ -70,9 +71,9 @@ export default function AdminSidebar() {
       <Link href="/auth/logout" style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '10px 22px', fontSize: 13.5, fontWeight: 600,
-        color: '#E24B4A', textDecoration: 'none', transition: 'all 0.2s'
+        color: 'var(--cs-danger)', textDecoration: 'none', transition: 'all 0.2s'
       }}>
-        <span style={{ fontSize: 16, width: 18, textAlign: 'center' }}>🚪</span>
+        <span style={{ display: 'flex', justifyContent: 'center', width: 18 }}><Icon name="logout" size="sm" /></span>
         Sign Out
       </Link>
     </aside>

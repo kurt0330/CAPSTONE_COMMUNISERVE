@@ -60,7 +60,7 @@ export default function Step2Employment({ fields, setFields, children }) {
   ];
 
   // ── self_employed_spec values (match employment_details schema) ─
-  const SELF_SPECS = ['Kasambahay', 'Electrician', 'Carpenter', 'Nanny', 'Other'];
+  const SELF_SPECS = ['Kasambahay', 'Electrician', 'Carpenter'];
 
   return (
     <div className="page-container step-panel" id="step-2">

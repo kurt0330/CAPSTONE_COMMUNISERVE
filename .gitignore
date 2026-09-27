@@ -5,3 +5,13 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Local-only Claude Code config: machine-specific settings, plus installed
+# skills that are themselves separate git checkouts (nested .git folders —
+# never add these as regular files). Never commit any of this.
+.claude/
+# Contains a hardcoded Supabase access token — never commit.
+.mcp.json
+# Playwright MCP's local trace/screenshot/console output — debugging
+# artifacts from browser testing, not project source.
+.playwright-mcp/

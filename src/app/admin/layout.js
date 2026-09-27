@@ -41,29 +41,37 @@ export default async function AdminLayout({ children }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: 'var(--cs-font)', color: 'var(--cs-text)' }}>
 
-      {/* ── Top Header ── */}
+      {/* ── Top Header ── (reskinned: white bar + hairline, design system v2) */}
       <header className="main-header" style={{
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'space-between',
         padding:        '0 24px',
         height:         90,
+        boxSizing:      'border-box', // width:100% + padding was overflowing the viewport
+        background:     'var(--cs-surface)',
+        borderBottom:   '1px solid var(--cs-border)',
       }}>
-        <h1 className="web-title">COMMUNISERVE</h1>
+        <h1 className="web-title" style={{
+          color: 'var(--cs-primary)', fontFamily: 'var(--cs-font)',
+          fontWeight: 800, letterSpacing: '-0.5px',
+        }}>
+          COMMUNISERVE
+        </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{
             fontSize: 12, fontWeight: 600,
-            color: 'rgba(255,255,255,0.85)',
-            background: 'rgba(255,255,255,0.15)',
+            color: 'var(--cs-primary)',
+            background: 'var(--cs-primary-tint)',
             padding: '4px 12px', borderRadius: 20,
           }}>
             Admin Panel
           </span>
           <div style={{
             width: 38, height: 38, borderRadius: '50%',
-            background: '#fff', color: '#0504AA',
+            background: 'var(--cs-primary)', color: '#fff',
             fontWeight: 700, fontSize: 16,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
@@ -77,7 +85,7 @@ export default async function AdminLayout({ children }) {
       {/* ── Body: Sidebar + Page Content ── */}
       <div style={{ display: 'flex', flex: 1, paddingTop: 90 }}>
         <AdminSidebar />
-        <main style={{ flex: 1, padding: '30px 32px', background: '#f0f0f0', minWidth: 0 }}>
+        <main style={{ flex: 1, padding: '30px 32px', background: 'var(--cs-bg)', minWidth: 0 }}>
           {children}
         </main>
       </div>

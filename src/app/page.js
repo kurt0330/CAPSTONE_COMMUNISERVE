@@ -2,6 +2,7 @@
 'use client'; 
 
 import { useState } from 'react';
+import Icon from '@/components/ui/Icon';
 import Link from 'next/link';
 
 export default function LandingPage() {
@@ -132,7 +133,7 @@ export default function LandingPage() {
           position: relative;
         }
         
-        /* 🔴 THE CARD DESIGN (Tilted & Scaled Up) */
+        /* THE CARD DESIGN (Tilted & Scaled Up) */
         .css-id-card {
           background: white;
           border-radius: 20px;
@@ -142,7 +143,7 @@ export default function LandingPage() {
           box-shadow: 0 25px 50px rgba(5, 4, 170, 0.1);
           border: 1px solid #f3f4f6;
           position: relative;
-          transform: rotate(3deg); /* 🔴 Restored the slight tilt */
+          transform: rotate(3deg); /* Restored the slight tilt */
           transition: transform 0.3s ease;
         }
         .css-id-card:hover {
@@ -246,6 +247,26 @@ export default function LandingPage() {
           box-shadow: 0 10px 20px rgba(5,4,170, 0.2);
         }
 
+        /* ── Header: wrap nav instead of overflowing on narrow screens ── */
+        @media (max-width: 640px) {
+          .landing-header {
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px 5%;
+          }
+          .header-logo { font-size: 1.4rem; }
+          .header-nav {
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+          }
+          .btn-solid, .btn-outline {
+            padding: 10px 20px;
+            font-size: 0.95rem;
+          }
+        }
+
         /* Mobile Adjustments */
         @media (max-width: 900px) {
           .panel-content {
@@ -256,6 +277,27 @@ export default function LandingPage() {
           .hero-title { font-size: 2.75rem; }
           .css-id-card { transform: rotate(0deg); max-width: 100%; }
           .floating-accent { right: 0; bottom: -15px; }
+        }
+
+        /* ── Small phones: further scale down hero + card content ── */
+        @media (max-width: 480px) {
+          .panel-content { padding: 40px 5%; gap: 32px; }
+          .hero-title { font-size: 2rem; }
+          .hero-subtitle { font-size: 1rem; margin-bottom: 28px; }
+          .css-id-card { padding: 20px; }
+          .avatar-circle { width: 56px; height: 56px; font-size: 28px; }
+          .card-title { font-size: 1.15rem; }
+          .card-role { font-size: 0.9rem; }
+          /* !important overrides the inline right/bottom offset on the
+             Customer panel's "Request Sent!" badge, which otherwise pushes
+             the badge past the viewport edge on narrow phones. */
+          .floating-accent {
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            right: 8px !important;
+            bottom: -12px !important;
+          }
+          .switch-view-btn { padding: 12px 18px; font-size: 0.95rem; margin-top: 30px; }
         }
       `}} />
 
@@ -310,12 +352,12 @@ export default function LandingPage() {
                 {/* ID CARD (TILTED) */}
                 <div className="css-id-card">
                   <div className="card-header">
-                    <div className="avatar-circle">👷</div>
+                    <div className="avatar-circle" style={{ color: '#0504AA' }}><Icon name="hard-hat" size="xl" /></div>
                     <div>
                       <h3 className="card-title">Juan Dela Cruz</h3>
                       <p className="card-role">Local Carpenter</p>
                       <div className="verified-badge">
-                        ✓ LGU Verified
+                        <Icon name="shield-check" size="xs" style={{ marginRight: 4 }} />LGU Verified
                       </div>
                     </div>
                   </div>
@@ -327,7 +369,7 @@ export default function LandingPage() {
                   </div>
 
                   <div className="floating-accent">
-                    ⭐ 5.0 Rating
+                    <Icon name="star" size="sm" style={{ color: '#F5A524', marginRight: 6 }} />5.0 Rating
                   </div>
                 </div>
 
@@ -336,7 +378,7 @@ export default function LandingPage() {
                   onClick={() => setIsCustomerView(true)}
                 >
                   <span>Looking to hire someone?</span>
-                  <span>➔</span>
+                  <Icon name="arrow-right" size="md" />
                 </button>
               </div>
 
@@ -366,12 +408,12 @@ export default function LandingPage() {
                 {/* ID CARD (TILTED OPPOSITE WAY FOR FLAIR) */}
                 <div className="css-id-card">
                   <div className="card-header">
-                    <div className="avatar-circle" style={{ background: '#fff8e6' }}>🔍</div>
+                    <div className="avatar-circle" style={{ background: '#fff8e6', color: '#0504AA' }}><Icon name="search" size="xl" /></div>
                     <div>
                       <h3 className="card-title">Search Services</h3>
                       <p className="card-role">Access 50+ Local Trades</p>
                       <div className="verified-badge customer-badge">
-                        📍 Anini-y, Antique
+                        <Icon name="map-pin" size="xs" style={{ marginRight: 4 }} />Anini-y, Antique
                       </div>
                     </div>
                   </div>
@@ -383,7 +425,7 @@ export default function LandingPage() {
                   </div>
 
                   <div className="floating-accent" style={{ bottom: '70px', right: '-35px', transform: 'rotate(2deg)' }}>
-                    ✅ Request Sent!
+                    <Icon name="check-circle" size="sm" style={{ color: '#1D9E75', marginRight: 6 }} />Request Sent!
                   </div>
                 </div>
 
@@ -391,7 +433,7 @@ export default function LandingPage() {
                   className="switch-view-btn" 
                   onClick={() => setIsCustomerView(false)}
                 >
-                  <span>⬅</span>
+                  <Icon name="arrow-left" size="md" />
                   <span>I want to offer my services</span>
                 </button>
               </div>

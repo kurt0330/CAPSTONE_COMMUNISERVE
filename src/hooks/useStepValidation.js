@@ -1,6 +1,8 @@
 // PATH: /src/hooks/useStepValidation.js
 // Direct translation of validate() from sp_steps.js
 
+import { NATIONAL_ID_PIN_LENGTH } from '@/lib/constants';
+
 export function useStepValidation() {
 
   function validateStep(step, formData, files) {
@@ -40,10 +42,19 @@ export function useStepValidation() {
     if (step === 4) return [];
 
     if (step === 5) {
-      if (!files?.file_national_id)      errors.push('Please upload your National ID (Front).');
-      if (!files?.file_national_id_back) errors.push('Please upload your National ID (Back).');
-      if (!files?.file_photo)            errors.push('Please upload your 2×2 photo.');
-      if (!formData.terms_agreed)        errors.push('Please accept the certification checkbox.');
+      // National ID is verified by PIN only — no photo upload (CAPSTONE_DOCS.md
+      // §0.1 D-1 / BR-17).
+      const pin = formData.national_id_pin ?? '';
+      if (!pin) {
+        errors.push('Please enter your National ID PIN.');
+      } else if (!/^\d+$/.test(pin)) {
+        errors.push('Your National ID PIN must contain digits only.');
+      } else if (pin.length !== NATIONAL_ID_PIN_LENGTH) {
+        errors.push(`Your National ID PIN must be exactly ${NATIONAL_ID_PIN_LENGTH} digits.`);
+      }
+
+      if (!files?.file_photo)     errors.push('Please upload your 2×2 photo.');
+      if (!formData.terms_agreed) errors.push('Please accept the certification checkbox.');
     }
 
     return errors; // empty array = valid

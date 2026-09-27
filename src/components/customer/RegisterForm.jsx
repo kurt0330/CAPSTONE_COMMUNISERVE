@@ -2,12 +2,20 @@
 // Full customer registration form with Custom Resend OTP verification phase.
 // Phase 1: form fields → trigger custom send-otp API (Resend)
 // Phase 2: OTP input → verify-otp API (creates user DB rows) → establish session → dashboard
+//
+// Styling note: presentation moved from inline style objects to
+// /src/styles/register-customer.css so the screen can use real media queries
+// and scale from phone to desktop. The registration/OTP logic below is
+// unchanged.
 
 'use client';
 
 import { useState } from 'react';
+import Icon from '@/components/ui/Icon';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+
+import '@/styles/register-customer.css';
 
 // ── Anini-y barangay list (complete) ──────────────────────────────────────
 const BARANGAYS = [
@@ -41,7 +49,7 @@ export default function RegisterForm() {
 
   // ── Phase control ─────────────────────────────────────────────────────
   const [phase,   setPhase]  = useState('form');   // 'form' | 'otp' | 'done'
-  const [regEmail,setRegEmail]= useState('');       
+  const [regEmail,setRegEmail]= useState('');
 
   // ── Form fields ───────────────────────────────────────────────────────
   const [fields, setFields] = useState({
@@ -140,7 +148,7 @@ export default function RegisterForm() {
         return;
       }
 
-      // 2. Account is successfully created on the backend! 
+      // 2. Account is successfully created on the backend!
       // Now we just log them in on the frontend to create their active browser session.
       const supabase = createClient();
       const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -177,7 +185,7 @@ export default function RegisterForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: regEmail })
       });
-      
+
       const data = await res.json();
 
       if (data.success) {
@@ -196,27 +204,31 @@ export default function RegisterForm() {
   //  PHASE: FORM
   // ════════════════════════════════════════════════════════════════
   if (phase === 'form') {
+    const confirmState = !fields.confirmPassword
+      ? ''
+      : (fields.confirmPassword === fields.password ? ' rc-input--ok' : ' rc-input--err');
+
     return (
-      <div style={styles.pageWrap}>
+      <div className="rc-wrap">
 
         {/* Branding */}
-        <div style={styles.brandBlock}>
-          <h1 style={styles.brandTitle}>COMMUNISERVE</h1>
-          <p style={styles.brandSub}>
+        <div className="rc-brand">
+          <h1 className="rc-brand-title">COMMUNISERVE</h1>
+          <p className="rc-brand-sub">
             Find trusted local service providers in Anini-y, Antique.
           </p>
         </div>
 
         {/* Card */}
-        <div style={styles.card}>
-          <h2 style={styles.cardTitle}>Create a Resident Account</h2>
-          <p style={styles.cardSub}>
+        <div className="rc-card">
+          <h2 className="rc-card-title">Create a Resident Account</h2>
+          <p className="rc-card-sub">
             Register to search and hire verified local workers.
           </p>
 
           {error && <ErrorBanner message={error} />}
 
-          <form onSubmit={handleRegister} style={styles.form}>
+          <form onSubmit={handleRegister} className="rc-form">
 
             <Field label="Full Name" required>
               <input
@@ -226,9 +238,7 @@ export default function RegisterForm() {
                 placeholder="e.g. Maria Santos"
                 required
                 autoComplete="name"
-                style={styles.input}
-                onFocus={focusInput}
-                onBlur={blurInput}
+                className="rc-input"
               />
             </Field>
 
@@ -240,9 +250,7 @@ export default function RegisterForm() {
                 placeholder="yourname@email.com"
                 required
                 autoComplete="email"
-                style={styles.input}
-                onFocus={focusInput}
-                onBlur={blurInput}
+                className="rc-input"
               />
             </Field>
 
@@ -254,9 +262,7 @@ export default function RegisterForm() {
                 placeholder="09XXXXXXXXX"
                 maxLength={11}
                 autoComplete="tel"
-                style={styles.input}
-                onFocus={focusInput}
-                onBlur={blurInput}
+                className="rc-input"
               />
             </Field>
 
@@ -265,9 +271,7 @@ export default function RegisterForm() {
                 value={fields.barangay}
                 onChange={set('barangay')}
                 required
-                style={{ ...styles.input, cursor: 'pointer' }}
-                onFocus={focusInput}
-                onBlur={blurInput}
+                className="rc-input rc-input--select"
               >
                 <option value="">— Select your barangay —</option>
                 {BARANGAYS.map((b) => (
@@ -277,7 +281,7 @@ export default function RegisterForm() {
             </Field>
 
             <Field label="Password" required>
-              <div style={{ position: 'relative' }}>
+              <div className="rc-pwd-wrap">
                 <input
                   type={showPwd ? 'text' : 'password'}
                   value={fields.password}
@@ -285,16 +289,15 @@ export default function RegisterForm() {
                   placeholder="Minimum 8 characters"
                   required
                   autoComplete="new-password"
-                  style={{ ...styles.input, paddingRight: 44 }}
-                  onFocus={focusInput}
-                  onBlur={blurInput}
+                  className="rc-input"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPwd((v) => !v)}
-                  style={styles.eyeBtn}
+                  className="rc-eye"
+                  aria-label={showPwd ? 'Hide password' : 'Show password'}
                 >
-                  {showPwd ? '🙈' : '👁'}
+                  <Icon name={showPwd ? 'eye-off' : 'eye'} size="md" />
                 </button>
               </div>
             </Field>
@@ -307,41 +310,32 @@ export default function RegisterForm() {
                 placeholder="Re-enter your password"
                 required
                 autoComplete="new-password"
-                style={{
-                  ...styles.input,
-                  borderColor: fields.confirmPassword
-                    ? fields.confirmPassword === fields.password
-                      ? '#1D9E75'
-                      : '#E24B4A'
-                    : '#ddd',
-                }}
-                onFocus={focusInput}
-                onBlur={blurInput}
+                className={`rc-input${confirmState}`}
               />
               {fields.confirmPassword && fields.confirmPassword === fields.password && (
-                <span style={styles.matchOk}>✓ Passwords match</span>
+                <span className="rc-match-ok"><Icon name="check" size="xs" style={{ marginRight: 4 }} />Passwords match</span>
               )}
               {fields.confirmPassword && fields.confirmPassword !== fields.password && (
-                <span style={styles.matchErr}>✗ Passwords do not match</span>
+                <span className="rc-match-err"><Icon name="close" size="xs" style={{ marginRight: 4 }} />Passwords do not match</span>
               )}
             </Field>
 
             <button
               type="submit"
               disabled={loading}
-              style={{ ...styles.submitBtn, background: loading ? '#999' : '#0504AA' }}
+              className="rc-submit"
             >
               {loading
                 ? <><Spinner /> Creating account…</>
-                : 'Create Account & Verify Email →'
+                : <>Create Account &amp; Verify Email <Icon name="arrow-right" size="sm" /></>
               }
             </button>
 
           </form>
 
-          <p style={styles.switchLink}>
+          <p className="rc-switch">
             Are you a service provider?{' '}
-            <a href="/register/provider" style={styles.link}>Apply here →</a>
+            <a href="/register/provider" className="rc-link">Apply here <Icon name="arrow-right" size="xs" /></a>
           </p>
         </div>
       </div>
@@ -353,26 +347,26 @@ export default function RegisterForm() {
   // ════════════════════════════════════════════════════════════════
   if (phase === 'otp') {
     return (
-      <div style={styles.pageWrap}>
-        <div style={{ ...styles.card, maxWidth: 420, textAlign: 'center' }}>
+      <div className="rc-wrap">
+        <div className="rc-card rc-card--narrow">
 
-          <div style={styles.otpIcon}>📧</div>
-          <h2 style={styles.cardTitle}>Check Your Email</h2>
-          <p style={styles.cardSub}>
+          <div className="rc-otp-icon" style={{ color: 'var(--sp-blue)' }}><Icon name="mail" size="2xl" /></div>
+          <h2 className="rc-card-title">Check Your Email</h2>
+          <p className="rc-card-sub">
             We sent a <strong>6-digit verification code</strong> to:
             <br />
-            <strong style={{ color: '#0504AA' }}>{regEmail}</strong>
+            <strong className="rc-email">{regEmail}</strong>
           </p>
-          <p style={{ fontSize: 12, color: '#aaa', marginBottom: 24 }}>
+          <p className="rc-note">
             Check your inbox (and spam folder). The code expires in 10 minutes.
           </p>
 
           {error && <ErrorBanner message={error} />}
           {resentMsg && (
-            <div style={styles.resentMsg}>{resentMsg}</div>
+            <div className="rc-resent">{resentMsg}</div>
           )}
 
-          <form onSubmit={handleVerifyOtp} style={styles.form}>
+          <form onSubmit={handleVerifyOtp} className="rc-form">
 
             <Field label="Verification Code" required>
               <input
@@ -385,26 +379,18 @@ export default function RegisterForm() {
                 placeholder="_ _ _ _ _ _"
                 required
                 autoComplete="one-time-code"
-                style={{
-                  ...styles.input,
-                  fontSize:      22,
-                  textAlign:     'center',
-                  letterSpacing: 10,
-                  fontWeight:    700,
-                }}
-                onFocus={focusInput}
-                onBlur={blurInput}
+                className="rc-input rc-input--otp"
               />
             </Field>
 
             <button
               type="submit"
               disabled={loading}
-              style={{ ...styles.submitBtn, background: loading ? '#999' : '#1D9E75' }}
+              className="rc-submit rc-submit--verify"
             >
               {loading
                 ? <><Spinner /> Verifying…</>
-                : 'Verify & Enter Dashboard →'
+                : <>Verify &amp; Enter Dashboard <Icon name="arrow-right" size="sm" /></>
               }
             </button>
 
@@ -414,17 +400,17 @@ export default function RegisterForm() {
             type="button"
             onClick={handleResend}
             disabled={resending}
-            style={styles.resendBtn}
+            className="rc-resend"
           >
-            {resending ? 'Sending…' : "Didn't receive a code? Resend →"}
+            {resending ? 'Sending…' : <>Didn&apos;t receive a code? Resend <Icon name="arrow-right" size="xs" /></>}
           </button>
 
-          <p style={{ marginTop: 16, fontSize: 12, color: '#aaa' }}>
+          <p className="rc-switch">
             Wrong email?{' '}
             <button
               type="button"
               onClick={() => { setPhase('form'); setOtpCode(''); setError(''); }}
-              style={{ background: 'none', border: 'none', color: '#0504AA', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+              className="rc-textbtn"
             >
               Go back
             </button>
@@ -440,12 +426,12 @@ export default function RegisterForm() {
   // ════════════════════════════════════════════════════════════════
   if (phase === 'done') {
     return (
-      <div style={styles.pageWrap}>
-        <div style={{ ...styles.card, textAlign: 'center', padding: '48px 40px' }}>
-          <div style={{ fontSize: 52, marginBottom: 16 }}>🎉</div>
-          <h2 style={{ ...styles.cardTitle, color: '#1D9E75' }}>Email Verified!</h2>
-          <p style={styles.cardSub}>Redirecting you to your dashboard…</p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#aaa', fontSize: 13 }}>
+      <div className="rc-wrap">
+        <div className="rc-card rc-card--center">
+          <div className="rc-done-icon" style={{ color: 'var(--sp-teal)' }}><Icon name="check-circle" size="2xl" /></div>
+          <h2 className="rc-card-title rc-card-title--success">Email Verified!</h2>
+          <p className="rc-card-sub">Redirecting you to your dashboard…</p>
+          <div className="rc-loading-row">
             <Spinner /> Loading…
           </div>
         </div>
@@ -462,10 +448,10 @@ export default function RegisterForm() {
 
 function Field({ label, required, children }) {
   return (
-    <div style={styles.fieldWrap}>
-      <label style={styles.label}>
+    <div className="rc-field">
+      <label className="rc-label">
         {label}
-        {required && <span style={styles.req}> *</span>}
+        {required && <span className="rc-req"> *</span>}
       </label>
       {children}
     </div>
@@ -474,195 +460,16 @@ function Field({ label, required, children }) {
 
 function ErrorBanner({ message }) {
   return (
-    <div style={styles.errorBanner}>
-      ⚠ {message}
+    <div className="rc-error">
+      <Icon name="warning" size="sm" style={{ marginRight: 6 }} />{message}
     </div>
   );
 }
 
 function Spinner() {
   return (
-    <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>
+    <span className="rc-spinner">
       ⟳
     </span>
   );
 }
-
-// ── Input focus/blur handlers ─────────────────────────────────────────────
-function focusInput(e) { e.target.style.borderColor = '#0504AA'; }
-function blurInput(e)  { e.target.style.borderColor = '#ddd'; }
-
-// ════════════════════════════════════════════════════════════════
-//  STYLES — const objects per architectural standard
-// ════════════════════════════════════════════════════════════════
-const styles = {
-  pageWrap: {
-    minHeight:      '100vh',
-    display:        'flex',
-    flexDirection:  'column',
-    alignItems:     'center',
-    justifyContent: 'center',
-    background:     '#f0f0f0',
-    fontFamily:     'Arial, sans-serif',
-    padding:        '40px 24px',
-  },
-  brandBlock: {
-    textAlign:    'center',
-    marginBottom: 28,
-  },
-  brandTitle: {
-    fontSize:      28,
-    fontWeight:    700,
-    color:         '#0504AA',
-    letterSpacing: 1.5,
-    margin:        '0 0 4px',
-  },
-  brandSub: {
-    fontSize: 13,
-    color:    '#777',
-    margin:   0,
-  },
-  card: {
-    background:   '#fff',
-    borderRadius: 12,
-    padding:      '36px 40px',
-    width:        '100%',
-    maxWidth:     480,
-    boxShadow:    '0 4px 24px rgba(0,0,0,0.10)',
-  },
-  cardTitle: {
-    fontSize:   18,
-    fontWeight: 700,
-    color:      '#111',
-    margin:     '0 0 6px',
-  },
-  cardSub: {
-    fontSize:     13,
-    color:        '#777',
-    margin:       '0 0 24px',
-    lineHeight:   1.6,
-  },
-  form: {
-    display:       'flex',
-    flexDirection: 'column',
-    gap:           18,
-  },
-  fieldWrap: {
-    display:       'flex',
-    flexDirection: 'column',
-    gap:           6,
-  },
-  label: {
-    fontSize:      12,
-    fontWeight:    700,
-    color:         '#333',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
-  req: {
-    color:      '#E24B4A',
-    fontWeight: 700,
-  },
-  input: {
-    padding:      '10px 14px',
-    border:       '1px solid #ddd',
-    borderRadius: 8,
-    fontSize:     14,
-    fontFamily:   'Arial, sans-serif',
-    outline:      'none',
-    width:        '100%',
-    boxSizing:    'border-box',
-    transition:   'border-color 0.2s',
-    background:   '#fff',
-  },
-  eyeBtn: {
-    position:   'absolute',
-    right:      12,
-    top:        '50%',
-    transform:  'translateY(-50%)',
-    background: 'none',
-    border:     'none',
-    cursor:     'pointer',
-    fontSize:   14,
-    color:      '#aaa',
-    padding:    0,
-  },
-  matchOk: {
-    fontSize:   11,
-    color:      '#1D9E75',
-    fontWeight: 600,
-    marginTop:  2,
-    display:    'block',
-  },
-  matchErr: {
-    fontSize:   11,
-    color:      '#E24B4A',
-    fontWeight: 600,
-    marginTop:  2,
-    display:    'block',
-  },
-  submitBtn: {
-    marginTop:      8,
-    padding:        '13px',
-    color:          '#fff',
-    border:         'none',
-    borderRadius:   8,
-    fontSize:       15,
-    fontWeight:     700,
-    cursor:         'pointer',
-    fontFamily:     'Arial, sans-serif',
-    transition:     'background 0.2s',
-    display:        'flex',
-    alignItems:     'center',
-    justifyContent: 'center',
-    gap:            8,
-    width:          '100%',
-  },
-  errorBanner: {
-    background:   '#fff5f5',
-    border:       '1.5px solid #E24B4A',
-    borderRadius: 8,
-    padding:      '11px 14px',
-    marginBottom: 16,
-    fontSize:     13,
-    color:        '#E24B4A',
-    fontWeight:   600,
-    lineHeight:   1.5,
-  },
-  otpIcon: {
-    fontSize:     48,
-    marginBottom: 16,
-  },
-  resentMsg: {
-    background:   '#e6f7f1',
-    border:       '1px solid #1D9E75',
-    borderRadius: 8,
-    padding:      '9px 14px',
-    marginBottom: 14,
-    fontSize:     13,
-    color:        '#1D9E75',
-    fontWeight:   600,
-  },
-  resendBtn: {
-    marginTop:      16,
-    background:     'none',
-    border:         'none',
-    color:          '#0504AA',
-    fontSize:       13,
-    fontWeight:     600,
-    cursor:         'pointer',
-    textDecoration: 'underline',
-    fontFamily:     'Arial, sans-serif',
-  },
-  switchLink: {
-    marginTop:  14,
-    fontSize:   12,
-    color:      '#aaa',
-    textAlign:  'center',
-  },
-  link: {
-    color:          '#0504AA',
-    fontWeight:     600,
-    textDecoration: 'none',
-  },
-};

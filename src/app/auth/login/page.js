@@ -1,13 +1,33 @@
 // PATH: /src/app/auth/login/page.js
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import Icon from '@/components/ui/Icon';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import RegisterForm from '@/components/customer/RegisterForm'; 
+import RegisterForm from '@/components/customer/RegisterForm';
 
+// useSearchParams() opts the subtree into client-side rendering, so Next.js
+// requires it to sit inside a Suspense boundary — without one the production
+// build fails to prerender this route.
 export default function UnifiedAuthPage() {
+  return (
+    <Suspense fallback={<AuthLoadingFallback />}>
+      <UnifiedAuthContent />
+    </Suspense>
+  );
+}
+
+function AuthLoadingFallback() {
+  return (
+    <div style={{ backgroundColor: '#f4f7ff', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, -apple-system, sans-serif', color: '#0504AA', fontWeight: 700 }}>
+      Loading…
+    </div>
+  );
+}
+
+function UnifiedAuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -23,7 +43,7 @@ export default function UnifiedAuthPage() {
   // ── UNIFIED LOGIN LOGIC ──
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPwd, setShowPwd] = useState(false); // 🟢 NEW: State for toggling password visibility
+  const [showPwd, setShowPwd] = useState(false); // toggles password visibility
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -238,15 +258,30 @@ export default function UnifiedAuthPage() {
         }
 
         @media (max-width: 768px) {
-          .back-home-btn { top: 20px; left: 20px; } 
+          .back-home-btn { top: 20px; left: 20px; }
           .auth-container { min-height: 100vh; border-radius: 0; display: flex; flex-direction: column; }
           .overlay-container { display: none; }
           .form-container { width: 100%; position: relative; opacity: 1; transform: none !important; animation: none !important; }
           .sign-up-container { display: ${isRightPanelActive ? 'block' : 'none'}; z-index: 10; }
           .sign-in-container { display: ${isRightPanelActive ? 'none' : 'block'}; z-index: 10; }
           .mobile-toggle { display: block !important; margin: 20px auto; text-align: center; }
+          /* The two floating logo badges are positioned with fixed pixel
+             offsets meant for the 900px two-panel desktop layout; on a
+             full-width mobile panel those offsets land on top of the
+             heading/form text, so pin them to a small corner badge instead. */
+          .auth-logo-icon {
+            top: 16px !important;
+            right: 16px !important;
+            left: auto !important;
+            height: 40px !important;
+          }
         }
         .mobile-toggle { display: none; background: none; border: none; color: #0504AA; font-weight: bold; text-decoration: underline; cursor: pointer; }
+
+        /* ── Small phones: tighten form padding so content isn't cramped ── */
+        @media (max-width: 480px) {
+          .form-container { padding: 24px 20px; }
+        }
       `}} />
 
       <div className={`auth-container ${isRightPanelActive ? 'right-panel-active' : ''}`}>
@@ -254,10 +289,11 @@ export default function UnifiedAuthPage() {
         {/* ── CUSTOMER SIGN UP PANEL ── */}
         <div className="form-container sign-up-container">
           
-          <img 
-            src="/logos/communiserve-icon.png" 
-            alt="CommuniServe Logo" 
-            style={{ position: 'absolute', top: '90px', right: '20px', height: '60px', objectFit: 'contain', zIndex: 10 }} 
+          <img
+            src="/logos/communiserve-icon.png"
+            alt="CommuniServe Logo"
+            className="auth-logo-icon"
+            style={{ position: 'absolute', top: '90px', right: '20px', height: '60px', objectFit: 'contain', zIndex: 10 }}
           />
 
           <div style={{ marginTop: '30px', marginInline: '-20px' }}>
@@ -272,10 +308,11 @@ export default function UnifiedAuthPage() {
         {/* ── UNIFIED SIGN IN PANEL ── */}
         <div className="form-container sign-in-container">
           
-          <img 
-            src="/logos/communiserve-icon.png" 
-            alt="CommuniServe Logo" 
-            style={{ position: 'absolute', top: '170px', right: '200px', height: '70px', objectFit: 'contain', zIndex: 10 }} 
+          <img
+            src="/logos/communiserve-icon.png"
+            alt="CommuniServe Logo"
+            className="auth-logo-icon"
+            style={{ position: 'absolute', top: '170px', right: '200px', height: '70px', objectFit: 'contain', zIndex: 10 }}
           />
 
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', maxWidth: '350px', margin: '0 auto' }}>
@@ -300,7 +337,7 @@ export default function UnifiedAuthPage() {
                 />
               </div>
 
-              {/* 🟢 NEW: Password field with toggle button */}
+              {/* Password field with visibility toggle */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <label style={{ fontSize: 13, fontWeight: 700, color: '#444' }}>Password</label>
                 <div style={{ position: 'relative' }}>
@@ -336,7 +373,7 @@ export default function UnifiedAuthPage() {
                       padding: 0
                     }}
                   >
-                    {showPwd ? '🙈' : '👁'}
+                    <Icon name={showPwd ? 'eye-off' : 'eye'} size="md" />
                   </button>
                 </div>
               </div>
@@ -346,7 +383,7 @@ export default function UnifiedAuthPage() {
                 disabled={loading} 
                 style={{ marginTop: 8, padding: '14px', background: loading ? '#999' : '#0504AA', color: '#fff', border: 'none', borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
               >
-                {loading ? 'Authenticating...' : 'Sign In →'}
+                {loading ? 'Authenticating...' : <>Sign In <Icon name="arrow-right" size="sm" /></>}
               </button>
             </form>
 

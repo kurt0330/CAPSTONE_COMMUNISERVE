@@ -9,7 +9,7 @@ export default function ProviderPieChart({ data }) {
 
   if (total === 0) {
     return (
-      <div style={{ display: 'flex', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 13, minHeight: '150px' }}>
+      <div style={{ display: 'flex', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--cs-text-muted)', fontSize: 13, minHeight: '150px' }}>
         No approved providers yet.
       </div>
     );
@@ -26,7 +26,7 @@ export default function ProviderPieChart({ data }) {
 
   // Colors requested: Green (Kasambahay), Orange (Carpenter), Yellow (Electrician)
   const COLORS = {
-    Kasambahay: '#1D9E75', 
+    Kasambahay: 'var(--cs-success)', 
     Carpenter:  '#F97316', 
     Electrician: '#FACC15' 
   };
@@ -45,16 +45,16 @@ export default function ProviderPieChart({ data }) {
           ${COLORS.Carpenter} ${kasEnd}% ${carEnd}%,
           ${COLORS.Electrician} ${carEnd}% 100%
         )`,
-        boxShadow: '0 6px 16px rgba(0,0,0,0.08)'
+        boxShadow: 'var(--cs-shadow)'
       }} />
 
       {/* ── THE LEGEND ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1 }}>
         <div>
-          <h3 style={{ margin: '0 0 2px 0', fontSize: '14px', fontWeight: 800, color: '#111' }}>
+          <h3 style={{ margin: '0 0 2px 0', fontSize: '14px', fontWeight: 800, color: 'var(--cs-text)' }}>
             Service Provider Breakdown
           </h3>
-          <p style={{ margin: 0, fontSize: '12px', color: '#777' }}>
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--cs-text-muted)' }}>
             Distribution of approved workers
           </p>
         </div>
@@ -68,10 +68,10 @@ export default function ProviderPieChart({ data }) {
             <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ width: '12px', height: '12px', borderRadius: '3px', backgroundColor: item.color }} />
-                <span style={{ color: '#444', fontWeight: 600 }}>{item.label}</span>
+                <span style={{ color: 'var(--cs-text-muted)', fontWeight: 600 }}>{item.label}</span>
               </div>
-              <div style={{ color: '#777', fontWeight: 500 }}>
-                <span style={{ color: '#111', fontWeight: 700, marginRight: '6px' }}>{item.count}</span> 
+              <div style={{ color: 'var(--cs-text-muted)', fontWeight: 500 }}>
+                <span style={{ color: 'var(--cs-text)', fontWeight: 700, marginRight: '6px' }}>{item.count}</span> 
                 ({item.pct.toFixed(1)}%)
               </div>
             </div>

@@ -1,9 +1,14 @@
 // PATH: /src/app/api/customer/send-otp/route.js
-import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import { createClient } from '@supabase/supabase-js';
+// M2 / BR-04 — issue a single-use 6-digit OTP for customer registration.
+//
+// Email delivery goes through /src/lib/resend.js, which falls back to printing
+// the code in the terminal when live email fails and the dev bypass is on —
+// so the verification screen is testable before a custom sending domain exists.
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { sendOtpEmail } from '@/lib/resend';
+import { isValidEmail } from '@/lib/validators';
 
 export async function POST(request) {
   try {
@@ -14,12 +19,11 @@ export async function POST(request) {
 
     const inputEmail = email.toLowerCase().trim();
 
-    // Connect to Supabase as Admin
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
+    if (!isValidEmail(inputEmail)) {
+      return NextResponse.json({ success: false, message: 'Please enter a valid email address.' }, { status: 400 });
+    }
+
+    const supabase = createAdminClient();
 
     // Look up if user is already present in public.users
     const { data: userExists } = await supabase
@@ -34,7 +38,7 @@ export async function POST(request) {
 
     // Generate a secure 6-digit numeric token
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5-minute lifespan stored as text!
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5-minute lifespan
 
     // Save or overwrite active OTP token for this input email address
     const { error: dbError } = await supabase
@@ -49,40 +53,24 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Failed to initialize verification sequence.' }, { status: 500 });
     }
 
-    const senderName = process.env.RESEND_FROM_NAME || 'CommuniServe';
-    const senderEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+    // Dispatch (or, under the dev bypass, print to the terminal)
+    const result = await sendOtpEmail({ to: inputEmail, otpCode });
 
-    // ── THE +TEST1 TRICK BYPASS ──────────────────────────────────────────
-    // If you use a +test email, this strips the + tag just for the delivery routing, 
-    // ensuring Resend Sandbox accepts it!
-    const targetDeliveryEmail = inputEmail.includes('+') 
-      ? inputEmail.replace(/\+[^@]+/, '') 
-      : inputEmail;
-    // ─────────────────────────────────────────────────────────────────────
-
-    // Dispatch via Resend API
-    const { error: resendError } = await resend.emails.send({
-      from: `${senderName} <${senderEmail}>`,
-      to: [targetDeliveryEmail], 
-      subject: 'Verify your Resident Account Registration',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; border: 1px solid #e2e8f0; padding: 32px; border-radius: 10px;">
-          <h2 style="color: #0504AA; margin-top: 0; text-align: center;">Account Verification</h2>
-          <p style="font-size: 14px; color: #334155; line-height: 1.5;">Welcome to CommuniServe! To complete your client profile registration for <b>${inputEmail}</b>, enter the 6-digit code provided below into the form verification page:</p>
-          <div style="background: #f1f5f9; padding: 18px; border-radius: 8px; text-align: center; margin: 24px 0;">
-            <span style="font-size: 36px; font-weight: 800; letter-spacing: 5px; color: #0504AA;">${otpCode}</span>
-          </div>
-          <p style="font-size: 11px; color: #64748b; text-align: center; margin-bottom: 0;">This temporary verification token expires in 5 minutes.</p>
-        </div>
-      `
-    });
-
-    if (resendError) {
-      console.error('[send-otp] Resend Error:', resendError);
-      return NextResponse.json({ success: false, message: 'Could not deliver the code to your email account.' }, { status: 500 });
+    if (!result.ok) {
+      return NextResponse.json(
+        { success: false, message: 'Could not deliver the code to your email account.' },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ success: true, message: 'OTP code dispatched.' });
+    return NextResponse.json({
+      success: true,
+      message: result.bypassed
+        ? 'OTP generated — check your terminal (developer bypass).'
+        : 'OTP code dispatched.',
+      devBypass: result.bypassed === true,
+    });
+
   } catch (error) {
     console.error('[send-otp] System Error:', error.message);
     return NextResponse.json({ success: false, message: 'Internal validation pipeline error.' }, { status: 500 });

@@ -3,7 +3,9 @@
 
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { isValidNationalIdPin, normalizeNationalIdPin } from '@/lib/validators';
+import { NATIONAL_ID_PIN_LENGTH } from '@/lib/constants';
 
 const ALLOWED_TRADES = ['Carpenter', 'Electrician', 'Kasambahay'];
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -28,10 +30,7 @@ async function uploadFile(supabase, file, bucket, folder) {
 }
 
 export async function registerProvider(formData) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  const supabase = createAdminClient();
 
   // ── 1. Extract all fields ──
   const email          = formData.get('email')?.trim() || null;
@@ -84,11 +83,12 @@ export async function registerProvider(formData) {
   const assessment_answers_raw = formData.get('assessment_answers');
   const assessment_answers    = assessment_answers_raw ? JSON.parse(assessment_answers_raw) : {};
 
+  // National ID — PIN number only, no ID photo (§0.1 D-1 / BR-17)
+  const national_id_pin = normalizeNationalIdPin(formData.get('national_id_pin'));
+
   // Files
-  const file_national_id      = formData.get('file_national_id');
-  const file_national_id_back = formData.get('file_national_id_back');
-  const file_photo             = formData.get('file_photo');
-  const file_certificate       = formData.get('file_certificate');
+  const file_photo       = formData.get('file_photo');
+  const file_certificate = formData.get('file_certificate');
 
   // ── 2. Server-side validation ──
   const errors = [];
@@ -107,10 +107,11 @@ export async function registerProvider(formData) {
   }
   if (age !== null && (age < 15 || age > 120)) errors.push('Age must be between 15 and 120.');
 
-  if (!file_national_id || file_national_id.size === 0)
-    errors.push('National ID (Front) is required.');
-  if (!file_national_id_back || file_national_id_back.size === 0)
-    errors.push('National ID (Back) is required.');
+  if (!national_id_pin) {
+    errors.push('National ID PIN is required.');
+  } else if (!isValidNationalIdPin(national_id_pin)) {
+    errors.push(`National ID PIN must be exactly ${NATIONAL_ID_PIN_LENGTH} digits.`);
+  }
   if (!file_photo || file_photo.size === 0)
     errors.push('2×2 photo is required.');
 
@@ -143,11 +144,25 @@ export async function registerProvider(formData) {
     }
   }
 
+  // ── 3b. Duplicate PIN check (BR-17) ──
+  // Fail fast with a clear message rather than hitting the UNIQUE constraint
+  // halfway through the inserts below.
+  const { data: pinTaken } = await supabase
+    .from('provider_identity')
+    .select('provider_id')
+    .eq('national_id_pin', national_id_pin)
+    .maybeSingle();
+
+  if (pinTaken) {
+    return {
+      success: false,
+      errors: ['This National ID PIN is already registered. Each PIN may only be used once.'],
+    };
+  }
+
   // ── 4. Upload files to Supabase Storage ──
   let uploadedPaths = {};
   try {
-    uploadedPaths.national_id      = await uploadFile(supabase, file_national_id,      'provider-files', 'national_ids');
-    uploadedPaths.national_id_back = await uploadFile(supabase, file_national_id_back, 'provider-files', 'national_ids');
     uploadedPaths.photo            = await uploadFile(supabase, file_photo,             'provider-files', 'photos');
     uploadedPaths.certificate      = file_certificate?.size > 0
       ? await uploadFile(supabase, file_certificate, 'provider-files', 'certificates')
@@ -193,6 +208,17 @@ export async function registerProvider(formData) {
     if (provError) throw provError;
     providerId = newProvider.provider_id;
 
+    // 5b-ii. Insert provider_identity — the National ID PIN (BR-17).
+    // Deliberately a separate table: customers can read approved providers
+    // rows, so the PIN must live where RLS keeps them out entirely.
+    const { error: identityError } = await supabase
+      .from('provider_identity')
+      .insert({
+        provider_id:     providerId,
+        national_id_pin: national_id_pin,
+      });
+    if (identityError) throw identityError;
+
     // 5c. Insert nsrp_details
     const { error: nsrpError } = await supabase
       .from('nsrp_details')
@@ -221,9 +247,10 @@ export async function registerProvider(formData) {
     if (empError) throw empError;
 
     // 5e. Insert provider_files
+    // No national_id / national_id_back rows any more — the ID is verified by
+    // PIN. Those file_type values remain valid in the table's CHECK
+    // constraint, so ID uploads can be reintroduced later without a migration.
     const fileRows = [
-      { file_type: 'national_id',      file_path: uploadedPaths.national_id,      original_name: file_national_id.name },
-      { file_type: 'national_id_back', file_path: uploadedPaths.national_id_back, original_name: file_national_id_back.name },
       { file_type: 'photo',            file_path: uploadedPaths.photo,            original_name: file_photo.name },
       uploadedPaths.certificate
         ? { file_type: 'certificate',  file_path: uploadedPaths.certificate,      original_name: file_certificate.name }
@@ -309,13 +336,25 @@ export async function registerProvider(formData) {
     };
 
   } catch (dbError) {
-    // Reverse order data rollbacks
+    // Reverse order data rollbacks.
+    // provider_identity has ON DELETE CASCADE, so deleting the provider row
+    // removes the identity row with it.
     if (providerId) await supabase.from('providers').delete().eq('provider_id', providerId);
     if (userId)     await supabase.from('users').delete().eq('user_id', userId);
 
     const pathsToDelete = Object.values(uploadedPaths).filter(Boolean);
     if (pathsToDelete.length > 0) {
       await supabase.storage.from('provider-files').remove(pathsToDelete);
+    }
+
+    // 23505 = unique_violation. The only UNIQUE this flow can hit is the
+    // National ID PIN, if someone claimed it between the check above and here.
+    if (dbError.code === '23505') {
+      console.error('[CommuniServe] Duplicate National ID PIN on registration.');
+      return {
+        success: false,
+        errors: ['This National ID PIN is already registered. Each PIN may only be used once.'],
+      };
     }
 
     console.error('[CommuniServe] Registration DB error:', dbError.message);

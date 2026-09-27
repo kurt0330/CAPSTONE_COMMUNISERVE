@@ -3,26 +3,27 @@
 // Schema: providers.trade_category ENUM('Carpenter','Electrician','Kasambahay','Nanny','Other')
 
 'use client';
+import Icon from '@/components/ui/Icon';
 
 // All 5 ENUM values from the schema — previously the action only allowed 3.
 const TRADES = [
   {
     value:    'Carpenter',
-    emoji:    '🪚',
+    icon:     'hammer',
     name:     'Carpenter',
     local:    'Panday',
     desc:     'Furniture making, house framing, wood repairs & general carpentry.',
   },
   {
     value:    'Electrician',
-    emoji:    '⚡',
+    icon:     'bolt',
     name:     'Electrician',
     local:    'Elektrisyano',
     desc:     'Wiring, outlet repair, panel setup & electrical maintenance.',
   },
   {
     value:    'Kasambahay',
-    emoji:    '🧹',
+    icon:     'broom',
     name:     'Kasambahay',
     local:    'Household Helper',
     desc:     'Cleaning, cooking, laundry, caregiving & household tasks.',
@@ -49,7 +50,7 @@ export default function Step3Trade({ fields, setFields, children }) {
         Using CSS grid with auto-fill so 5 cards sit naturally at 3+2.
       */}
       <div className="trade-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-        {TRADES.map(({ value, emoji, name, local, desc }) => {
+        {TRADES.map(({ value, icon, name, local, desc }) => {
           const isSelected = fields.trade_category === value;
           return (
             <label
@@ -75,13 +76,16 @@ export default function Step3Trade({ fields, setFields, children }) {
                     : { borderTop: '4px solid transparent' }
                 }
               >
-                <div className="trade-emoji">{emoji}</div>
+                <div className="trade-emoji" style={{ color: 'var(--sp-blue)' }}>
+                  <Icon name={icon} size="2xl" />
+                </div>
                 <strong className="trade-name">{name}</strong>
                 <span className="trade-local">{local}</span>
                 <p className="trade-desc">{desc}</p>
                 {isSelected && (
                   <span className="trade-badge" style={{ display: 'inline-flex' }}>
-                    ✓ Selected
+                    <Icon name="check" size="xs" style={{ marginRight: 4 }} />
+                    Selected
                   </span>
                 )}
               </div>
