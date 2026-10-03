@@ -68,14 +68,17 @@ export default function AdminSidebar() {
         System
       </p>
 
-      <Link href="/auth/logout" style={{
+      {/* Plain <a>, NOT <Link>: production builds prefetch every <Link> in the
+          viewport, and prefetching this route handler runs signOut() — it was
+          killing the admin session the moment the sidebar rendered. */}
+      <a href="/auth/logout" style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '10px 22px', fontSize: 13.5, fontWeight: 600,
         color: 'var(--cs-danger)', textDecoration: 'none', transition: 'all 0.2s'
       }}>
         <span style={{ display: 'flex', justifyContent: 'center', width: 18 }}><Icon name="logout" size="sm" /></span>
         Sign Out
-      </Link>
+      </a>
     </aside>
   );
 }
