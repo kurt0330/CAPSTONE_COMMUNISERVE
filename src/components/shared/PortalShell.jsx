@@ -13,6 +13,7 @@ import { usePathname } from 'next/navigation';
 
 import Icon from '@/components/ui/Icon';
 import LogoutButton from '@/components/shared/LogoutButton';
+import { useJobRealtime } from '@/hooks/useJobRealtime';
 
 export default function PortalShell({
   portalLabel,
@@ -26,6 +27,10 @@ export default function PortalShell({
   children,
 }) {
   const pathname = usePathname();
+
+  // Live job/offer updates on every portal page (requests list, negotiation
+  // thread, dashboard counts) — the shell wraps them all.
+  useJobRealtime();
 
   // A nav item is active on its own route, its sub-routes, and any extra
   // prefixes it claims (e.g. Search stays lit on /customer/providers/[id]).
