@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 
 import Icon from '@/components/ui/Icon';
 import PriceInput from '@/components/shared/PriceInput';
+import { useConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { respondToOffer } from '@/actions/jobActions';
 import { negotiationState } from '@/lib/negotiation';
 import { formatPeso, formatDate } from '@/lib/format';
@@ -20,6 +21,7 @@ import { PAYMENT_STRUCTURES } from '@/lib/constants';
 
 export default function NegotiationPanel({ job, viewer, otherPartyName }) {
   const router = useRouter();
+  const { confirm, dialog } = useConfirmDialog();
   const { isOpen, myTurn, offers, latest } = negotiationState(job, viewer);
 
   const [countering, setCountering] = useState(false);
@@ -36,7 +38,15 @@ export default function NegotiationPanel({ job, viewer, otherPartyName }) {
       const n = Number(amount);
       if (!Number.isFinite(n) || n <= 0) { setError('Enter the amount you want to offer.'); return; }
     }
-    if (action === 'decline' && !window.confirm('Decline this request? This ends the negotiation.')) return;
+    if (action === 'decline') {
+      const ok = await confirm({
+        title: 'Decline this request?',
+        message: 'This ends the negotiation. It cannot be reopened.',
+        confirmLabel: 'Decline',
+        cancelLabel: 'Keep negotiating',
+      });
+      if (!ok) return;
+    }
 
     setBusy(action);
     setError('');
@@ -127,6 +137,8 @@ export default function NegotiationPanel({ job, viewer, otherPartyName }) {
           </div>
         </div>
       )}
+
+      {dialog}
     </div>
   );
 }

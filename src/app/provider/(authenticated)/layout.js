@@ -24,7 +24,7 @@ export default async function AuthenticatedProviderLayout({ children }) {
   // 1. Fetch from public.users
   const { data: publicUser, error: userError } = await supabase
     .from('users')
-    .select('user_id, full_name, role, onboarding_complete')
+    .select('user_id, full_name, role, onboarding_complete, avatar_url')
     .eq('auth_id', user.id)
     .single();
 
@@ -73,6 +73,8 @@ export default async function AuthenticatedProviderLayout({ children }) {
       initials={initials}
       headerExtra={ratingChip}
       logoutHref="/provider/logout"
+      avatarUrl={publicUser.avatar_url}
+      profileHref="/provider/portfolio"
     >
       {children}
     </PortalShell>

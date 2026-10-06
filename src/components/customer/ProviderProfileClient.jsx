@@ -13,25 +13,27 @@ import ProfileHeaderCard      from '@/components/shared/ProfileHeaderCard';
 import StatRow                from '@/components/shared/StatRow';
 import TabNav, { TabPanel }   from '@/components/shared/TabNav';
 import ListCard, { MetaItem } from '@/components/shared/ListCard';
-import GalleryGrid            from '@/components/shared/GalleryGrid';
 import StarRating             from '@/components/shared/StarRating';
 import EmptyState             from '@/components/shared/EmptyState';
 import ServiceCard            from '@/components/shared/ServiceCard';
 import BookingSheet           from '@/components/customer/BookingSheet';
+import Avatar                 from '@/components/shared/Avatar';
 import Icon                   from '@/components/ui/Icon';
 
 import { TRADE_ICONS } from '@/lib/constants';
 import { initialsOf, formatDate } from '@/lib/format';
+import { isImageName } from '@/lib/uploads';
 
 const TABS = [
   { key: 'services', label: 'Services' },
   { key: 'about',    label: 'About'    },
   { key: 'skills',   label: 'Skills'   },
+  { key: 'credentials', label: 'Credentials' },
   { key: 'gallery',  label: 'Gallery'  },
   { key: 'reviews',  label: 'Reviews'  },
 ];
 
-export default function ProviderProfileClient({ provider, services = [], skills, files, reviews }) {
+export default function ProviderProfileClient({ provider, services = [], skills, files, gallery = [], reviews }) {
   const [activeTab, setActiveTab] = useState('services');
   // undefined = sheet closed · null = Custom Service · object = fixed service
   const [booking,   setBooking]   = useState(undefined);
@@ -48,6 +50,9 @@ export default function ProviderProfileClient({ provider, services = [], skills,
     { icon: 'toolbox', value: services.length,                                 label: 'Services' },
     { icon: 'id-card', value: provider.id_verified ? 'Yes' : 'Pending',        label: 'ID Verified' },
   ];
+
+  // Résumé + every skill certificate the provider has uploaded.
+  const credentialCount = files.length + (provider.resume ? 1 : 0);
 
   const isPanday = provider.trade_category === 'Carpenter';
   const tradeIcon = TRADE_ICONS[provider.trade_category] ?? 'toolbox';
@@ -84,9 +89,24 @@ export default function ProviderProfileClient({ provider, services = [], skills,
             </div>
           )}
 
-          <TabNav tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
+          {/* Informational only — the customer can still book or send an offer. */}
+          {provider.occupied && (
+            <div className="info-banner" role="status">
+              <Icon name="info" size="md" />
+              <div>
+                <p className="info-banner-title">
+                  This provider is currently handling another request.
+                </p>
+                <p className="info-banner-text">
+                  You can still send a custom request, but please expect a slight waiting time.
+                </p>
+              </div>
+            </div>
+          )}
 
-          <TabPanel>
+          <TabNav tabs={TABS} activeTab={activeTab} onChange={setActiveTab} scroll />
+
+          <TabPanel stable>
 
             {activeTab === 'services' && (
               <>
@@ -135,12 +155,23 @@ export default function ProviderProfileClient({ provider, services = [], skills,
                   <p className="tab-panel-text">
                     {provider.bio || 'This provider has not added a bio yet.'}
                   </p>
+                  {credentialCount > 0 && (
+                    <button
+                      type="button"
+                      className="btn-ghost-app btn-sm"
+                      style={{ marginTop: 12 }}
+                      onClick={() => setActiveTab('credentials')}
+                    >
+                      <Icon name="certificate" size="sm" />
+                      View credentials ({credentialCount})
+                    </button>
+                  )}
                 </div>
 
                 <div>
                   <p className="tab-panel-heading">Service Provider</p>
                   <ListCard
-                    thumb={initialsOf(provider.full_name)}
+                    thumb={<Avatar src={provider.avatar_url} name={provider.full_name} />}
                     title={provider.full_name}
                     subtitle={provider.trade_category}
                     meta={<MetaItem icon="map-pin">{provider.barangay}, Anini-y</MetaItem>}
@@ -174,12 +205,58 @@ export default function ProviderProfileClient({ provider, services = [], skills,
               </>
             )}
 
+            {activeTab === 'credentials' && (
+              <>
+                <p className="tab-panel-heading">
+                  Credentials <span className="tab-panel-count">({credentialCount})</span>
+                </p>
+                {credentialCount === 0 ? (
+                  <EmptyState
+                    icon="certificate"
+                    title="No credentials yet"
+                    hint="This provider has not uploaded a résumé or certificates."
+                  />
+                ) : (
+                  <div className="doc-list">
+                    {provider.resume && (
+                      <CredentialRow label="Résumé" name={provider.resume.name} url={provider.resume.url} />
+                    )}
+                    {files.map((file) => (
+                      <CredentialRow
+                        key={file.file_id}
+                        label="Skill certificate"
+                        name={file.original_name}
+                        url={file.url}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
             {activeTab === 'gallery' && (
               <>
                 <p className="tab-panel-heading">
-                  Credentials <span className="tab-panel-count">({files.length})</span>
+                  Work photos <span className="tab-panel-count">({gallery.length})</span>
                 </p>
-                <GalleryGrid files={files} />
+                {gallery.length === 0 ? (
+                  <EmptyState icon="image" title="No work photos yet" hint="This provider has not added photos of their work." />
+                ) : (
+                  <div className="gallery-grid">
+                    {gallery.map((image) => (
+                      <a
+                        className="gallery-tile gallery-tile--photo"
+                        key={image.image_id}
+                        href={image.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Open work photo"
+                      >
+                        <img src={image.url} alt={image.caption || 'Work photo'} className="gallery-tile-img" loading="lazy" />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </>
             )}
 
@@ -199,7 +276,7 @@ export default function ProviderProfileClient({ provider, services = [], skills,
                     <div className="review-card" key={review.rating_id}>
                       <div className="review-head">
                         <div className="review-avatar">
-                          {initialsOf(review.reviewer_name)}
+                          <Avatar src={review.avatar_url} name={review.reviewer_name} />
                         </div>
                         <div>
                           <p className="review-name">{review.reviewer_name}</p>
@@ -228,6 +305,31 @@ export default function ProviderProfileClient({ provider, services = [], skills,
           onClose={() => setBooking(undefined)}
           onBooked={(type) => { setBooking(undefined); setSentType(type); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
         />
+      )}
+    </div>
+  );
+}
+
+/** One credential a customer can open: résumé or skill certificate. */
+function CredentialRow({ label, name, url }) {
+  return (
+    <div className="doc-row">
+      <span className="doc-row-thumb">
+        {url && isImageName(name)
+          ? <img src={url} alt="" className="avatar-img" loading="lazy" width="48" height="48" />
+          : <Icon name={label === 'Résumé' ? 'file' : 'certificate'} size="lg" />}
+      </span>
+      <div className="doc-row-body">
+        <p className="doc-row-label">{label}</p>
+        <p className="doc-row-name" title={name}>{name}</p>
+      </div>
+      {url ? (
+        <a href={url} target="_blank" rel="noopener noreferrer" className="btn-ghost-app btn-sm">
+          <Icon name="external-link" size="sm" />
+          View
+        </a>
+      ) : (
+        <span className="dash-muted">Unavailable</span>
       )}
     </div>
   );

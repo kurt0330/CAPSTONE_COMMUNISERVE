@@ -9,7 +9,7 @@ import Link from 'next/link';
 import RequestCard from '@/components/customer/RequestCard';
 import EmptyState  from '@/components/shared/EmptyState';
 import Icon        from '@/components/ui/Icon';
-import { JOB_STATUSES } from '@/lib/constants';
+import { JOB_STATUSES, jobStatusLabel } from '@/lib/constants';
 import { negotiationState } from '@/lib/negotiation';
 
 const ACTION_FILTER = 'Needs your reply';
@@ -61,7 +61,7 @@ export default function CustomerRequestsClient({ requests = [] }) {
             className={`filter-chip${filter === status ? ' active' : ''}`}
             onClick={() => setFilter(status)}
           >
-            {status}
+            {jobStatusLabel(status)}
           </button>
         ))}
       </div>
@@ -72,7 +72,7 @@ export default function CustomerRequestsClient({ requests = [] }) {
           title={
             requests.length === 0
               ? 'No requests yet'
-              : `No ${filter.toLowerCase()} requests`
+              : `No ${jobStatusLabel(filter).toLowerCase()} requests`
           }
           hint="Search for a provider in your barangay to send your first request."
         />

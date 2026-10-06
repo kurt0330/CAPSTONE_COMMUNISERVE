@@ -33,6 +33,8 @@ export const ICONS = {
   // ── Status & feedback ────────────────────────────────────────────────
   'warning':        { file: 'warning.svg',        flaticon: 'warning' },
   'help':           { file: 'help.svg',           flaticon: 'question mark' },
+  'info':           { file: 'info.svg',           flaticon: 'information circle' },
+  'play':           { file: 'play.svg',           flaticon: 'play start' },
   'hourglass':      { file: 'hourglass.svg',      flaticon: 'hourglass' },
   'clock':          { file: 'clock.svg',          flaticon: 'clock' },
   'shield-check':   { file: 'shield-check.svg',   flaticon: 'verified shield' },

@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import Icon from '@/components/ui/Icon';
+import Avatar from '@/components/shared/Avatar';
 import LogoutButton from '@/components/shared/LogoutButton';
 import { useJobRealtime } from '@/hooks/useJobRealtime';
 
@@ -24,6 +25,8 @@ export default function PortalShell({
   initials,
   headerExtra,
   logoutHref,
+  avatarUrl,        // the signed-in user's photo, when they have one
+  profileHref,      // where the header avatar leads (the user's profile page)
   children,
 }) {
   const pathname = usePathname();
@@ -71,7 +74,20 @@ export default function PortalShell({
               <p className="portal-user-name">{userName}</p>
               {userSub && <p className="portal-user-sub">{userSub}</p>}
             </div>
-            <div className="portal-avatar" title={userName}>{initials}</div>
+            {profileHref ? (
+              <Link
+                href={profileHref}
+                className={`portal-avatar portal-avatar-link${pathname.startsWith(profileHref) ? ' active' : ''}`}
+                aria-label="My profile"
+                title="My profile"
+              >
+                <Avatar src={avatarUrl} name={userName} fallback={initials} />
+              </Link>
+            ) : (
+              <div className="portal-avatar" title={userName}>
+                <Avatar src={avatarUrl} name={userName} fallback={initials} />
+              </div>
+            )}
             <LogoutButton href={logoutHref} />
           </div>
 

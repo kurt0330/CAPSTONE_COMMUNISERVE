@@ -31,7 +31,7 @@ export default async function CustomerAuthLayout({ children }) {
   // ── Gate 3: Role must be Customer ─────────────────────────────────────
   const { data: publicUser } = await supabase
     .from('users')
-    .select('user_id, full_name, barangay, role')
+    .select('user_id, full_name, barangay, role, avatar_url')
     .eq('auth_id', user.id)
     .single();
 
@@ -65,6 +65,8 @@ export default async function CustomerAuthLayout({ children }) {
       userSub={publicUser.barangay}
       initials={initials}
       logoutHref="/customer/logout"
+      avatarUrl={publicUser.avatar_url}
+      profileHref="/customer/profile"
     >
       {children}
     </PortalShell>

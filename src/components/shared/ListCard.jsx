@@ -6,6 +6,8 @@
 //   - `trailing` renders in the right-hand slot (rating, status pill)
 //   - `chevron` adds a right chevron under the trailing slot (tappable rows)
 //   - `children` renders below the body (e.g. an action button row)
+//   - `footer` renders under the whole card at full width (a primary
+//     action that should not be squeezed into the body column on phones)
 
 import Link from 'next/link';
 import Icon from '@/components/ui/Icon';
@@ -20,6 +22,7 @@ export default function ListCard({
   href,
   onClick,
   children,
+  footer,
 }) {
   const inner = (
     <>
@@ -36,15 +39,18 @@ export default function ListCard({
           {chevron && <Icon name="chevron-right" size="md" className="list-card-chevron" />}
         </div>
       )}
+      {footer && <div className="list-card-footer">{footer}</div>}
     </>
   );
 
+  const className = footer ? 'list-card list-card--with-footer' : 'list-card';
+
   // Link variant — whole card is tappable (large tap target, per §13 UI rules)
   if (href) {
-    return <Link href={href} className="list-card">{inner}</Link>;
+    return <Link href={href} className={className}>{inner}</Link>;
   }
 
-  return <div className="list-card" onClick={onClick}>{inner}</div>;
+  return <div className={className} onClick={onClick}>{inner}</div>;
 }
 
 /** One icon + text pair inside a ListCard's `meta` row. */

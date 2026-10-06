@@ -1,0 +1,275 @@
+// CommuniServe — database ERD (public schema), generated from the live
+// Supabase project on 2026-10-06.
+// Paste this whole file into https://dbdiagram.io/d  →  Export → PNG / PDF.
+
+Project CommuniServe {
+  database_type: 'PostgreSQL'
+  Note: 'LGU workforce-verification web app — Anini-y, Antique'
+}
+
+// ── Accounts ──────────────────────────────────────────────────────────
+Table users {
+  user_id bigint [pk]
+  auth_id uuid [note: 'links to Supabase auth.users.id']
+  full_name varchar [not null]
+  email varchar [not null]
+  password_hash varchar [not null]
+  role text [not null, note: 'Admin | Provider | Customer']
+  contact_number varchar
+  barangay varchar [not null]
+  municipality varchar [not null]
+  province varchar [not null]
+  onboarding_complete boolean [not null]
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table admins {
+  admin_id bigint [pk]
+  user_id bigint [ref: > users.user_id]
+  office varchar [not null]
+  position varchar
+}
+
+Table customers {
+  customer_id bigint [pk]
+  user_id bigint [ref: > users.user_id]
+  preferred_barangay varchar
+}
+
+Table customer_otps {
+  email varchar [pk]
+  otp varchar [not null]
+  expires_at text [not null]
+  created_at timestamptz
+}
+
+// ── Providers & verification ──────────────────────────────────────────
+Table providers {
+  provider_id bigint [pk]
+  user_id bigint [ref: > users.user_id]
+  trade_category text [not null, note: 'Electrician | Carpenter | Kasambahay']
+  admin_status text [not null, note: 'Pending | Approved | Rejected']
+  rejected_at timestamptz
+  average_rating numeric [not null]
+  bio text
+}
+
+Table provider_identity {
+  provider_id bigint [pk, ref: - providers.provider_id]
+  national_id_pin text [not null]
+  id_verified_at timestamptz
+  id_verified_by bigint [ref: > admins.admin_id]
+  created_at timestamptz [not null]
+}
+
+Table nsrp_details {
+  nsrp_id bigint [pk]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  last_name varchar [not null]
+  first_name varchar [not null]
+  middle_name varchar
+  suffix varchar
+  date_of_birth date [not null]
+  age smallint [not null]
+  sex text [not null]
+  civil_status text [not null]
+  pres_street varchar
+  pres_barangay varchar [not null]
+  pres_city varchar [not null]
+  pres_province varchar [not null]
+  perm_street varchar
+  perm_barangay varchar
+  perm_city varchar
+  perm_province varchar
+  father_name varchar
+  father_contact varchar
+  mother_name varchar
+  mother_contact varchar
+  parents_civil_status text
+  is_4ps_beneficiary boolean [not null]
+  is_indigent boolean [not null]
+  is_pwd boolean [not null]
+  is_senior_citizen boolean [not null]
+  is_solo_parent boolean [not null]
+}
+
+Table employment_details {
+  employment_id bigint [pk]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  employment_status text [not null]
+  employment_type text [not null]
+  unemployment_reason text [not null]
+  self_employed_spec varchar
+  highest_education text
+  school_last_attended varchar
+  course_completed varchar
+  year_graduated varchar
+  employment_history text
+}
+
+Table provider_files {
+  file_id bigint [pk]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  file_type text [not null]
+  file_path varchar [not null]
+  original_name varchar [not null]
+  uploaded_at timestamptz [not null]
+}
+
+Table skills {
+  skill_id bigint [pk]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  skill_name varchar [not null]
+  description varchar
+  years_experience smallint [not null]
+}
+
+// ── Skill assessment ──────────────────────────────────────────────────
+Table assessment_tests {
+  test_id bigint [pk]
+  admin_id bigint [not null, ref: > admins.admin_id]
+  trade_category text [not null]
+  test_title varchar [not null]
+  passing_score numeric [not null]
+  is_active boolean [not null]
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table assessment_questions {
+  question_id bigint [pk]
+  test_id bigint [not null, ref: > assessment_tests.test_id]
+  question_text text [not null]
+  question_order smallint [not null]
+  points smallint [not null]
+}
+
+Table assessment_choices {
+  choice_id bigint [pk]
+  question_id bigint [not null, ref: > assessment_questions.question_id]
+  choice_text varchar [not null]
+  is_correct boolean [not null]
+  choice_order smallint [not null]
+}
+
+Table assessment_attempts {
+  attempt_id bigint [pk]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  test_id bigint [not null, ref: > assessment_tests.test_id]
+  score_raw numeric
+  score_pct numeric
+  passed boolean
+  started_at timestamptz [not null]
+  submitted_at timestamptz
+}
+
+Table assessment_answers {
+  answer_id bigint [pk]
+  attempt_id bigint [not null, ref: > assessment_attempts.attempt_id]
+  question_id bigint [not null, ref: > assessment_questions.question_id]
+  chosen_choice_id bigint [ref: > assessment_choices.choice_id]
+}
+
+Table assessments {
+  assessment_id bigint [pk]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  admin_id bigint [not null, ref: > admins.admin_id]
+  test_score numeric
+  lgu_status text [not null]
+  remarks text
+  assessed_at timestamptz [not null]
+}
+
+// ── Services, hiring & ratings ────────────────────────────────────────
+Table service_catalog {
+  catalog_id bigint [pk]
+  trade_category text [not null]
+  service_name varchar [not null]
+  description text
+  price_unit varchar [not null]
+  sort_order smallint [not null]
+  is_active boolean [not null]
+  created_at timestamptz [not null]
+}
+
+Table provider_services {
+  provider_service_id bigint [pk]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  catalog_id bigint [not null, ref: > service_catalog.catalog_id]
+  price numeric [not null]
+  is_active boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz
+}
+
+Table job_requests {
+  job_id bigint [pk]
+  customer_id bigint [not null, ref: > customers.customer_id]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  service_description text [not null]
+  service_street varchar
+  service_barangay varchar [not null]
+  job_status text [not null, note: 'Pending | Accepted | Ongoing | Completed | Declined | Cancelled']
+  requested_at timestamptz [not null]
+  accepted_at timestamptz
+  started_at timestamptz
+  completed_at timestamptz
+  request_type text [note: 'fixed | custom']
+  provider_service_id bigint [ref: > provider_services.provider_service_id]
+  service_name varchar
+  agreed_price numeric
+  payment_structure text [note: 'arawan | pakyawan']
+}
+
+Table job_offers {
+  offer_id bigint [pk]
+  job_id bigint [not null, ref: > job_requests.job_id]
+  offered_by text [not null, note: 'customer | provider']
+  amount numeric [not null]
+  note text
+  created_at timestamptz [not null]
+}
+
+Table ratings {
+  rating_id bigint [pk]
+  job_id bigint [not null, ref: > job_requests.job_id]
+  customer_id bigint [not null, ref: > customers.customer_id]
+  provider_id bigint [not null, ref: > providers.provider_id]
+  stars smallint [not null, note: '1-5']
+  review_text text
+  rated_at timestamptz [not null]
+}
+
+TableGroup Accounts {
+  users
+  admins
+  customers
+  customer_otps
+}
+
+TableGroup Providers {
+  providers
+  provider_identity
+  nsrp_details
+  employment_details
+  provider_files
+  skills
+}
+
+TableGroup Assessment {
+  assessment_tests
+  assessment_questions
+  assessment_choices
+  assessment_attempts
+  assessment_answers
+  assessments
+}
+
+TableGroup Hiring {
+  service_catalog
+  provider_services
+  job_requests
+  job_offers
+  ratings
+}

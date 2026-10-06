@@ -14,7 +14,7 @@ export const metadata = { title: 'Find a Provider — CommuniServe' };
 export default async function CustomerSearchPage() {
   const supabase = createServerClient();
 
-  const { data, error } = await supabase.rpc('get_approved_providers', {
+  const { data, error } = await supabase.rpc('get_provider_directory', {
     p_provider_id: null,
   });
 

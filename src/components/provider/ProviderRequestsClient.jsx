@@ -12,7 +12,7 @@ import ToggleSwitch   from '@/components/shared/ToggleSwitch';
 import EmptyState     from '@/components/shared/EmptyState';
 import Icon           from '@/components/ui/Icon';
 
-import { JOB_STATUSES } from '@/lib/constants';
+import { JOB_STATUSES, jobStatusLabel } from '@/lib/constants';
 import { respondToJobRequest } from '@/actions/jobActions';
 import { negotiationState } from '@/lib/negotiation';
 
@@ -98,7 +98,7 @@ export default function ProviderRequestsClient({ requests = [] }) {
             className={`filter-chip${filter === status ? ' active' : ''}`}
             onClick={() => setFilter(status)}
           >
-            {status}
+            {jobStatusLabel(status)}
           </button>
         ))}
       </div>
@@ -109,7 +109,7 @@ export default function ProviderRequestsClient({ requests = [] }) {
           title={
             requests.length === 0
               ? 'No requests yet'
-              : `No ${filter.toLowerCase()} requests`
+              : `No ${jobStatusLabel(filter).toLowerCase()} requests`
           }
           hint="New requests from residents will appear here."
         />
@@ -122,6 +122,7 @@ export default function ProviderRequestsClient({ requests = [] }) {
               busy={busyId === request.job_id || isPending}
               onAccept={(id) => respond(id, 'accept')}
               onReject={(id) => respond(id, 'decline')}
+              onStart={(id) => respond(id, 'start')}
             />
           ))}
         </div>

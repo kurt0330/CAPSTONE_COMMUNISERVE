@@ -2,13 +2,17 @@
 // One of the customer's own job requests.
 //   fixed / legacy → read-only; only the provider changes the status (BR-06)
 //   custom         → negotiation thread; the customer answers counter-offers
+//   In Progress    → "Mark Job as Completed" opens the rating sheet
 
 'use client';
 
+import { useState }           from 'react';
 import Link                   from 'next/link';
+import { useRouter }          from 'next/navigation';
 import ListCard, { MetaItem } from '@/components/shared/ListCard';
 import StatusPill             from '@/components/shared/StatusPill';
 import NegotiationPanel       from '@/components/shared/NegotiationPanel';
+import RateProviderSheet      from '@/components/customer/RateProviderSheet';
 import Icon                   from '@/components/ui/Icon';
 import { TRADE_ICONS, PAYMENT_STRUCTURES } from '@/lib/constants';
 import { formatDate, formatPeso } from '@/lib/format';
@@ -29,9 +33,37 @@ export default function RequestCard({ request }) {
     requested_at,
   } = request;
 
+  const router = useRouter();
+  const [rating, setRating] = useState(false);   // rate-and-complete sheet open?
+
   const { isCustom, myTurn } = negotiationState(request, 'customer');
   const price = displayPrice(request);
   const structure = PAYMENT_STRUCTURES[payment_structure];
+
+  // Full-width row under the card. The customer concludes the job: they are
+  // the one who checks the work.
+  let footer = null;
+  if (job_status === 'Accepted') {
+    footer = (
+      <p className="job-hint">
+        <Icon name="hourglass" size="sm" />
+        Waiting for {provider_name} to start the job.
+      </p>
+    );
+  } else if (job_status === 'Ongoing') {
+    footer = (
+      <>
+        <p className="job-hint">
+          <Icon name="info" size="sm" />
+          Once the work is done and you have checked it, mark the job as completed.
+        </p>
+        <button type="button" className="btn-primary-app btn-block" onClick={() => setRating(true)}>
+          <Icon name="check-circle" size="sm" />
+          Mark Job as Completed
+        </button>
+      </>
+    );
+  }
 
   return (
     <ListCard
@@ -46,6 +78,7 @@ export default function RequestCard({ request }) {
         </>
       }
       trailing={myTurn ? <span className="turn-badge">Your turn</span> : <StatusPill status={job_status} />}
+      footer={footer}
     >
       {price != null && (
         <div className="request-price-row">
@@ -70,6 +103,14 @@ export default function RequestCard({ request }) {
             View Provider
           </Link>
         </div>
+      )}
+
+      {rating && (
+        <RateProviderSheet
+          job={request}
+          onClose={() => setRating(false)}
+          onDone={() => { setRating(false); router.refresh(); }}
+        />
       )}
     </ListCard>
   );

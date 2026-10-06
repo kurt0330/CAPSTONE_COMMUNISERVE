@@ -36,26 +36,38 @@ export function useJobRealtime() {
       timer = setTimeout(() => router.refresh(), REFRESH_DELAY_MS);
     }
 
-    // Unique topic per mount, so a remount never collides with a channel
-    // that is still closing.
-    let channel = supabase.channel(`job-activity-${Date.now()}`);
-    TABLES.forEach((table) => {
-      channel = channel.on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table },
-        scheduleRefresh
-      );
-    });
+    let channel = null;
+    let cancelled = false;
 
-    let wasConnected = false;
-    channel.subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        // Events sent while the socket was down are lost, so catch up
-        // after a reconnect (not on the very first connect).
-        if (wasConnected) scheduleRefresh();
-        wasConnected = true;
-      }
-    });
+    async function connect() {
+      // Load the signed-in user's token BEFORE joining. On a fresh page load
+      // the client has not read the session cookie yet; joining first would
+      // subscribe anonymously, and RLS would then hide every change.
+      await supabase.realtime.setAuth();
+      if (cancelled) return;
+
+      // Unique topic per mount, so a remount never collides with a channel
+      // that is still closing.
+      channel = supabase.channel(`job-activity-${Date.now()}`);
+      TABLES.forEach((table) => {
+        channel = channel.on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table },
+          scheduleRefresh
+        );
+      });
+
+      let wasConnected = false;
+      channel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          // Events sent while the socket was down are lost, so catch up
+          // after a reconnect (not on the very first connect).
+          if (wasConnected) scheduleRefresh();
+          wasConnected = true;
+        }
+      });
+    }
+    connect();
 
     // Phones suspend the socket when the tab is in the background; catch
     // up as soon as the user comes back.
@@ -65,9 +77,10 @@ export function useJobRealtime() {
     document.addEventListener('visibilitychange', onVisible);
 
     return () => {
+      cancelled = true;
       clearTimeout(timer);
       document.removeEventListener('visibilitychange', onVisible);
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [router]);
 }

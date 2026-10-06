@@ -41,6 +41,17 @@ export const NATIONAL_ID_PIN_LENGTH = 16;
 // database exactly — note it is 'Declined', not 'Rejected'.
 export const JOB_STATUSES = ['Pending', 'Accepted', 'Ongoing', 'Completed', 'Declined', 'Cancelled'];
 
+// What the user reads for a status. The database value stays 'Ongoing';
+// the interface calls it "In Progress".
+const JOB_STATUS_LABELS = { Ongoing: 'In Progress' };
+export const jobStatusLabel = (status) => JOB_STATUS_LABELS[status] ?? status;
+
+// A provider with a job in one of these is shown as "Currently on a job".
+export const ACTIVE_JOB_STATUSES = ['Accepted', 'Ongoing'];
+
+// ── Ratings (T-ratings) ─────────────────────────────────────────────────────
+export const REVIEW_MAX_LENGTH = 500;
+
 // ── Anini-y barangay list ────────────────────────────────────────────────────
 // Copied from src/components/customer/RegisterForm.jsx's existing list rather
 // than importing it, since that component is being visually re-skinned but not

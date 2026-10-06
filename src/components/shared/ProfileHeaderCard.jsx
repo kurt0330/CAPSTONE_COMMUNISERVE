@@ -6,11 +6,13 @@
 'use client';
 
 import Icon from '@/components/ui/Icon';
+import Avatar from '@/components/shared/Avatar';
 
 export default function ProfileHeaderCard({
   provider,
   editable = false,
   onFieldChange,
+  avatar,           // optional node replacing the static photo (e.g. <AvatarUploader />)
 }) {
   if (!provider) return null;
 
@@ -20,17 +22,29 @@ export default function ProfileHeaderCard({
     barangay,
     id_verified,
     avatar_initials,
+    avatar_url,
+    nickname,
+    occupied,          // has a job Accepted / In Progress for another customer
   } = provider;
 
   return (
     <div className="profile-header-card">
-      <div className="profile-avatar">
-        {avatar_initials}
-        {id_verified && <span className="profile-avatar-dot" aria-hidden="true" />}
-      </div>
+      {avatar ?? (
+        <div className="profile-avatar">
+          <Avatar src={avatar_url} name={full_name} fallback={avatar_initials} />
+          {id_verified && <span className="profile-avatar-dot" aria-hidden="true" />}
+        </div>
+      )}
 
       <div className="profile-identity">
         <p className="profile-name">{full_name}</p>
+        {nickname && <p className="profile-nickname">&ldquo;{nickname}&rdquo;</p>}
+        {occupied && (
+          <span className="occupied-pill">
+            <Icon name="clock" size="xs" />
+            Currently on a job
+          </span>
+        )}
         <p className="profile-trade">{trade_category}</p>
 
         <div className="profile-meta-row">

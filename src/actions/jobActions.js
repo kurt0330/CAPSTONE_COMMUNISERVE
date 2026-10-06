@@ -83,16 +83,18 @@ export async function createJobRequest({
 }
 
 /**
- * Provider accepts or declines one of their own requests.
+ * Provider accepts, declines or starts one of their own requests.
  * RLS ("Providers update own requests") guarantees they cannot touch
- * anyone else's job, so no extra ownership check is needed here.
+ * anyone else's job, and the guard_job_lifecycle trigger enforces the
+ * order (a job can only be started once Accepted).
+ * There is deliberately no 'complete' here: only the customer concludes a
+ * job — see completeJobWithReview().
  */
 export async function respondToJobRequest(jobId, action) {
   const nextStatus = {
     accept:   'Accepted',
     decline:  'Declined',
     start:    'Ongoing',
-    complete: 'Completed',
   }[action];
 
   if (!nextStatus) return { success: false, error: 'Unknown action.' };
@@ -105,7 +107,6 @@ export async function respondToJobRequest(jobId, action) {
   const patch = { job_status: nextStatus };
   if (nextStatus === 'Accepted')  patch.accepted_at  = new Date().toISOString();
   if (nextStatus === 'Ongoing')   patch.started_at   = new Date().toISOString();
-  if (nextStatus === 'Completed') patch.completed_at = new Date().toISOString();
 
   const { error } = await supabase
     .from('job_requests')
@@ -114,11 +115,44 @@ export async function respondToJobRequest(jobId, action) {
 
   if (error) {
     console.error('[jobActions] Respond failed:', error.message);
-    return { success: false, error: 'Could not update this request.' };
+    return { success: false, error: friendlyDbError(error, 'Could not update this request.') };
   }
 
   revalidatePath('/provider/requests');
   return { success: true, status: nextStatus };
+}
+
+/**
+ * Customer confirms the work is done and rates the provider (BR-07).
+ * complete_job_with_review() does both in one transaction: the job becomes
+ * Completed and the rating is saved, which recalculates the provider's
+ * average. It also checks the job is the caller's own and is In Progress.
+ */
+export async function completeJobWithReview(jobId, stars, comment) {
+  const rating = Number(stars);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return { success: false, error: 'Please choose a rating from 1 to 5 stars.' };
+  }
+
+  const supabase = createServerClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: 'You must be signed in.' };
+
+  const { data: status, error } = await supabase.rpc('complete_job_with_review', {
+    p_job_id:  jobId,
+    p_stars:   rating,
+    p_comment: comment?.trim() || null,
+  });
+
+  if (error) {
+    console.error('[jobActions] Complete failed:', error.message);
+    return { success: false, error: friendlyDbError(error, 'Could not complete this job. Please try again.') };
+  }
+
+  revalidatePath('/customer/requests');
+  revalidatePath('/provider/requests');
+  return { success: true, status };
 }
 
 /**

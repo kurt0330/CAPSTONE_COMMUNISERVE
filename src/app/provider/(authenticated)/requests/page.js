@@ -10,7 +10,10 @@ export const metadata = { title: 'My Requests — CommuniServe Provider' };
 export default async function ProviderRequestsPage() {
   const supabase = createServerClient();
 
-  const { data, error } = await supabase.rpc('get_provider_jobs');
+  const [{ data, error }, { data: avatars }] = await Promise.all([
+    supabase.rpc('get_provider_jobs'),
+    supabase.rpc('get_job_avatars'),
+  ]);
 
   if (error) {
     console.error('[provider/requests] Load failed:', error.message);
@@ -27,5 +30,8 @@ export default async function ProviderRequestsPage() {
     );
   }
 
-  return <ProviderRequestsClient requests={data ?? []} />;
+  const avatarByJob = Object.fromEntries((avatars ?? []).map((a) => [a.job_id, a.customer_avatar_url]));
+  const requests = (data ?? []).map((r) => ({ ...r, customer_avatar_url: avatarByJob[r.job_id] ?? null }));
+
+  return <ProviderRequestsClient requests={requests} />;
 }
