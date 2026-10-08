@@ -1,6 +1,7 @@
 // PATH: /src/app/provider/(authenticated)/dashboard/page.js
 // Provider dashboard — Server Component.
 //   • activity counts
+//   • the 5 newest requests still waiting (the full list lives in My Requests)
 //   • the 5 most recent completed jobs, each with the rating it received
 // Read through the session client: the provider's own rows under RLS and
 // SECURITY DEFINER functions scoped to the caller.
@@ -14,13 +15,15 @@ import Avatar                 from '@/components/shared/Avatar';
 import EmptyState             from '@/components/shared/EmptyState';
 import ListCard, { MetaItem } from '@/components/shared/ListCard';
 import StarRating             from '@/components/shared/StarRating';
+import StatusPill             from '@/components/shared/StatusPill';
 
 import { formatDate, formatPeso } from '@/lib/format';
-import { negotiationState } from '@/lib/negotiation';
+import { negotiationState, displayPrice } from '@/lib/negotiation';
 
 export const metadata = { title: 'My Dashboard — CommuniServe Provider' };
 
 const RECENT_LIMIT = 5;
+const NEW_REQUEST_LIMIT = 5;
 
 export default async function ProviderDashboardPage() {
   const supabase = createServerClient();
@@ -29,16 +32,17 @@ export default async function ProviderDashboardPage() {
 
   const { data: me } = await supabase
     .from('users')
-    .select('user_id, full_name, nickname')
+    .select('user_id')
     .eq('auth_id', user.id)
     .single();
 
   if (!me) redirect('/auth/login');
 
-  const [{ data: provider }, { data: jobRows }, { data: completedRows }] = await Promise.all([
+  const [{ data: provider }, { data: jobRows }, { data: completedRows }, { data: avatarRows }] = await Promise.all([
     supabase.from('providers').select('trade_category, admin_status').eq('user_id', me.user_id).single(),
     supabase.rpc('get_provider_jobs'),
     supabase.rpc('get_provider_completed_jobs', { p_limit: RECENT_LIMIT }),
+    supabase.rpc('get_job_avatars'),
   ]);
 
   const jobs      = jobRows ?? [];
@@ -53,7 +57,14 @@ export default async function ProviderDashboardPage() {
   const count = (...statuses) => jobs.filter((j) => statuses.includes(j.job_status)).length;
   const completedTotal = count('Completed');
 
-  const greetingName = me.nickname || me.full_name?.split(' ')[0] || 'Provider';
+  // New requests = still Pending, newest first (get_provider_jobs is already
+  // ordered that way). Only a handful here; My Requests has them all.
+  const myTurn = (j) =>
+    j.request_type === 'custom' ? negotiationState(j, 'provider').myTurn : j.job_status === 'Pending';
+  const pending = jobs.filter((j) => j.job_status === 'Pending');
+  const newRequests = pending.slice(0, NEW_REQUEST_LIMIT);
+  const avatarByJob = Object.fromEntries((avatarRows ?? []).map((a) => [a.job_id, a.customer_avatar_url]));
+
 
   return (
     <div className="app-page">
@@ -61,15 +72,14 @@ export default async function ProviderDashboardPage() {
       {/* Greeting + status */}
       <div className="dash-hero">
         <div>
-          <h1 className="dash-greeting">Good day, {greetingName}!</h1>
-          <p className="dash-greeting-sub">Here is your service activity overview.</p>
+          <h1 className="visually-hidden">Dashboard</h1>
           <span className="verified-badge">
             <span className="status-dot status-dot--on" />
             {provider?.admin_status} · {provider?.trade_category}
           </span>
         </div>
         <div className="form-actions">
-          <Link href="/provider/requests" className="btn-primary-app">
+          <Link href="/provider/requests" className="btn-ghost-app">
             <Icon name="clipboard" size="sm" />
             My Requests
           </Link>
@@ -86,6 +96,62 @@ export default async function ProviderDashboardPage() {
         <MetricCard icon="wrench"       value={count('Accepted', 'Ongoing')} label="Active Jobs" />
         <MetricCard icon="check-circle" value={completedTotal}               label="Jobs Completed" />
       </div>
+
+      <div className="dash-columns dash-columns--flush">
+
+      {/* New requests */}
+      <section className="section-card" aria-labelledby="new-requests-title">
+        <div className="section-card-head">
+          <h2 className="section-card-title" id="new-requests-title">New Requests</h2>
+          {pending.length > 0 && (
+            <span className="section-card-count">{newRequests.length} of {pending.length}</span>
+          )}
+        </div>
+        <div className="section-card-body">
+          {newRequests.length === 0 ? (
+            <EmptyState
+              icon="inbox"
+              title="No new requests"
+              hint="When a resident books you or sends an offer, it shows here."
+            />
+          ) : (
+            <div className="dash-list">
+              {newRequests.map((job) => {
+                const price = displayPrice(job);
+                return (
+                  <ListCard
+                    key={job.job_id}
+                    href="/provider/requests"
+                    thumb={<Avatar src={avatarByJob[job.job_id]} name={job.customer_name} />}
+                    title={job.customer_name}
+                    subtitle={[job.service_name, job.service_description].filter(Boolean).join(' — ')}
+                    meta={
+                      <>
+                        <MetaItem icon="calendar">{formatDate(job.requested_at)}</MetaItem>
+                        <MetaItem icon="map-pin">{job.service_barangay}</MetaItem>
+                        {price != null && (
+                          <span className="dash-price">
+                            {job.agreed_price != null ? '' : 'Offer '}{formatPeso(price)}
+                          </span>
+                        )}
+                      </>
+                    }
+                    trailing={myTurn(job)
+                      ? <span className="turn-badge">Your turn</span>
+                      : <StatusPill status={job.job_status} />}
+                  />
+                );
+              })}
+            </div>
+          )}
+          <Link href="/provider/requests" className="btn-primary-app btn-block dash-cta">
+            <Icon name="clipboard" size="sm" />
+            {pending.length > newRequests.length
+              ? `View All ${pending.length} New Requests`
+              : 'View All Requests'}
+          </Link>
+        </div>
+      </section>
 
       {/* Recent completed jobs */}
       <section className="section-card">
@@ -130,12 +196,14 @@ export default async function ProviderDashboardPage() {
               ))}
             </div>
           )}
-          <Link href="/provider/requests" className="btn-primary-app btn-block dash-cta">
+          <Link href="/provider/requests" className="btn-ghost-app btn-block dash-cta">
             <Icon name="clipboard" size="sm" />
             View All Completed Jobs / History
           </Link>
         </div>
       </section>
+
+      </div>
 
     </div>
   );

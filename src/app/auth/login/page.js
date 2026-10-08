@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import RegisterForm from '@/components/customer/RegisterForm';
+import EmailInput from '@/components/ui/EmailInput';
+import { completeEmail } from '@/lib/email';
 
 // useSearchParams() opts the subtree into client-side rendering, so Next.js
 // requires it to sit inside a Suspense boundary — without one the production
@@ -54,7 +56,11 @@ function UnifiedAuthContent() {
 
     const supabase = createClient();
 
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    // "juan" → "juan@gmail.com" (covers pressing Enter while still in the field)
+    const fullEmail = completeEmail(email);
+    if (fullEmail !== email) setEmail(fullEmail);
+
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email: fullEmail, password });
 
     if (authError) {
       setError('Invalid email or password. Please try again.');
@@ -327,12 +333,12 @@ function UnifiedAuthContent() {
 
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: 13, fontWeight: 700, color: '#444' }}>Email Address</label>
-                <input 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  required 
+                <label htmlFor="login_email" style={{ fontSize: 13, fontWeight: 700, color: '#444' }}>Email Address</label>
+                <EmailInput
+                  id="login_email"
+                  value={email}
+                  onValueChange={setEmail}
+                  required
                   style={{ padding: '12px 14px', border: '1px solid #ddd', borderRadius: 8, fontSize: 14, outline: 'none' }}
                 />
               </div>

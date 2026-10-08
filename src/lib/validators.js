@@ -2,7 +2,7 @@
 // Shared validation + normalisation helpers.
 // Pure functions only — no network calls, safe to import anywhere.
 
-import { NATIONAL_ID_PIN_LENGTH } from './constants';
+import { NATIONAL_ID_PIN_LENGTH, MIN_PROVIDER_AGE } from './constants';
 
 // ══════════════════════════════════════════════════════════════════
 //  PHILIPPINE MOBILE NUMBERS
@@ -35,7 +35,46 @@ export function isValidPHMobile(raw) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  NATIONAL ID PIN  (BR-17)
+//  AGE
+// ══════════════════════════════════════════════════════════════════
+
+/**
+ * Whole years between a 'YYYY-MM-DD' birth date and today. The parts are read
+ * as a calendar date (not through new Date(string), which is UTC and can be a
+ * day off), so a birthday counts from local midnight.
+ * Returns null when the value is not a real date or is in the future.
+ */
+export function ageFromBirthDate(value, today = new Date()) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value ?? ''));
+  if (!m) return null;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const dob = new Date(y, mo - 1, d);
+  if (dob.getFullYear() !== y || dob.getMonth() !== mo - 1 || dob.getDate() !== d) return null;
+
+  let age = today.getFullYear() - y;
+  const beforeBirthday =
+    today.getMonth() < mo - 1 || (today.getMonth() === mo - 1 && today.getDate() < d);
+  if (beforeBirthday) age -= 1;
+  return age < 0 ? null : age;
+}
+
+/**
+ * Why a birth date cannot be accepted for a provider application, or '' when
+ * it is fine. One wording for the form, the step check and the server.
+ */
+export function providerAgeProblem(value, today = new Date()) {
+  if (!value) return '';
+  const age = ageFromBirthDate(value, today);
+  if (age === null) return 'Please enter a valid date of birth.';
+  if (age < MIN_PROVIDER_AGE) {
+    return `Age requirement not met. You must be at least ${MIN_PROVIDER_AGE} years old to register as a service provider.`;
+  }
+  if (age > 120) return 'Please check the year of your date of birth.';
+  return '';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  NATIONAL ID CARD NUMBER  (BR-17)
 // ══════════════════════════════════════════════════════════════════
 
 /** Digits only, exactly NATIONAL_ID_PIN_LENGTH characters. */
@@ -50,7 +89,7 @@ export function normalizeNationalIdPin(raw) {
 }
 
 /**
- * BR-17: the PIN is masked everywhere except the admin verification screen.
+ * BR-17: the card number is masked everywhere except the admin verification screen.
  * 1234567890123456 → •••• •••• •••• 3456
  */
 export function maskNationalIdPin(pin) {

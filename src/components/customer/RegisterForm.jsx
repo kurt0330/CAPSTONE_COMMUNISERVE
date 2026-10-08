@@ -14,6 +14,8 @@ import { useState } from 'react';
 import Icon from '@/components/ui/Icon';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import EmailInput from '@/components/ui/EmailInput';
+import { completeEmail } from '@/lib/email';
 
 import '@/styles/register-customer.css';
 
@@ -81,7 +83,12 @@ export default function RegisterForm() {
     setError('');
 
     // Client-side validation
+    // "maria" → "maria@gmail.com" (covers pressing Enter while still in the field)
+    const email = completeEmail(fields.email);
+    if (email !== fields.email) setFields((prev) => ({ ...prev, email }));
+
     if (!fields.full_name.trim()) return setError('Full name is required.');
+    if (!/^\S+@\S+\.\S+$/.test(email)) return setError('Please enter a valid email address.');
     if (!fields.barangay) return setError('Please select your barangay.');
     if (fields.password.length < 8) return setError('Password must be at least 8 characters.');
     if (fields.password !== fields.confirmPassword) return setError('Passwords do not match.');
@@ -93,7 +100,7 @@ export default function RegisterForm() {
       const res = await fetch('/api/customer/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: fields.email.trim() })
+        body: JSON.stringify({ email })
       });
 
       const data = await res.json();
@@ -105,7 +112,7 @@ export default function RegisterForm() {
       }
 
       // Success! Move to OTP phase
-      setRegEmail(fields.email.trim());
+      setRegEmail(email);
       setPhase('otp');
     } catch (err) {
       setError('A network error occurred. Please try again.');
@@ -243,13 +250,11 @@ export default function RegisterForm() {
             </Field>
 
             <Field label="Email Address" required>
-              <input
-                type="email"
+              <EmailInput
+                id="customer_email"
                 value={fields.email}
-                onChange={set('email')}
-                placeholder="yourname@email.com"
+                onValueChange={(v) => setFields((prev) => ({ ...prev, email: v }))}
                 required
-                autoComplete="email"
                 className="rc-input"
               />
             </Field>

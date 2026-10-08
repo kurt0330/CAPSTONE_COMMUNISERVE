@@ -31,7 +31,14 @@ export const PAYMENT_STRUCTURES = {
   },
 };
 
-// ── National ID PIN (CAPSTONE_DOCS.md §0.1 D-1 / BR-17) ─────────────────────
+// ── Provider registration: minimum age ──────────────────────────────────────
+// Applicants must be at least this old on the day they register. Checked the
+// moment the birth date is entered (Step 1) and again on the server.
+export const MIN_PROVIDER_AGE = 18;
+
+// ── National ID card number (BR-17) ─────────────────────────────────────────
+// Shown to users as "card number". The identifier keeps its original name
+// because the column is provider_identity.national_id_pin.
 // PhilSys Card Number (PCN) is commonly 16 digits; Q-01 recommends this as the
 // default length until the LGU confirms PCN vs. the 12-digit PSN.
 export const NATIONAL_ID_PIN_LENGTH = 16;

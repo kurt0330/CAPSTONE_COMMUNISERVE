@@ -15,3 +15,6 @@ node_modules/
 # Playwright MCP's local trace/screenshot/console output — debugging
 # artifacts from browser testing, not project source.
 .playwright-mcp/
+
+# separate build folder for verification builds / a second dev server (NEXT_DIST_DIR)
+.next-test/

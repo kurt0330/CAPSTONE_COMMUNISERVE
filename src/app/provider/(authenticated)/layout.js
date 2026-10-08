@@ -56,6 +56,10 @@ export default async function AuthenticatedProviderLayout({ children }) {
 
   const initials = publicUser.full_name?.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase() ?? 'SP';
 
+  // New requests and customer replies since this provider last opened
+  // My Requests (the tab's notification badge).
+  const { data: newsCount } = await supabase.rpc('get_request_news_count');
+
   const ratingChip = (
     <span className="portal-chip" title="Your average rating">
       <Icon name="star" size="sm" />
@@ -75,6 +79,8 @@ export default async function AuthenticatedProviderLayout({ children }) {
       logoutHref="/provider/logout"
       avatarUrl={publicUser.avatar_url}
       profileHref="/provider/portfolio"
+      newsHref="/provider/requests"
+      newsCount={newsCount ?? 0}
     >
       {children}
     </PortalShell>

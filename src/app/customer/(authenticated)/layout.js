@@ -53,6 +53,10 @@ export default async function CustomerAuthLayout({ children }) {
   if (!customerRow) redirect('/auth/login');
 
   // ── All gates passed ──────────────────────────────────────────────────
+  // Requests with a reply or status change from a provider since this
+  // customer last opened My Requests (the tab's notification badge).
+  const { data: newsCount } = await supabase.rpc('get_request_news_count');
+
   const initials = publicUser.full_name
     ?.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase() ?? 'C';
 
@@ -67,6 +71,8 @@ export default async function CustomerAuthLayout({ children }) {
       logoutHref="/customer/logout"
       avatarUrl={publicUser.avatar_url}
       profileHref="/customer/profile"
+      newsHref="/customer/requests"
+      newsCount={newsCount ?? 0}
     >
       {children}
     </PortalShell>

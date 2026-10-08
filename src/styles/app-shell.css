@@ -3139,3 +3139,48 @@ html:has(.portal-shell) {
   .confirm-backdrop,
   .confirm-card { animation: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   NAV NOTIFICATION BADGE (My Requests) · dashboard columns variant
+   (new selectors only)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Anchor for the badge; added alongside the existing nav link classes */
+.nav-has-badge {
+  position: relative;
+}
+
+/* Small red circle with the count, at the upper right of the tab */
+.nav-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  box-sizing: border-box;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--cs-radius-pill);
+  border: 2px solid var(--cs-surface);
+  background: var(--cs-danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* Phone tab bar: the tab is a wide column, so sit the badge at the upper
+   right of the icon rather than in the far corner of the tab. */
+.portal-tab-link .nav-badge {
+  top: 8px;
+  right: calc(50% - 22px);
+}
+
+/* Two dashboard sections side by side on desktop, with no extra top gap */
+.dash-columns--flush {
+  margin-top: 0;
+}

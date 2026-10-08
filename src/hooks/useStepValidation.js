@@ -2,6 +2,8 @@
 // Direct translation of validate() from sp_steps.js
 
 import { NATIONAL_ID_PIN_LENGTH } from '@/lib/constants';
+import { providerAgeProblem } from '@/lib/validators';
+import { completeEmail } from '@/lib/email';
 
 export function useStepValidation() {
 
@@ -18,10 +20,14 @@ export function useStepValidation() {
           errors.push(`${key.replace(/_/g, ' ')} is required.`);
         }
       });
+      // Age comes first: nothing else matters if the applicant is under age.
+      const ageProblem = providerAgeProblem(formData.date_of_birth);
+      if (ageProblem) errors.unshift(ageProblem);
+
       if (!formData.sex)          errors.push('Please select your sex.');
       if (!formData.civil_status) errors.push('Please select your civil status.');
       const emailRegex = /\S+@\S+\.\S+/;
-      if (formData.email && !emailRegex.test(formData.email)) {
+      if (formData.email && !emailRegex.test(completeEmail(formData.email))) {
         errors.push('Please enter a valid email address.');
       }
     }
@@ -42,16 +48,18 @@ export function useStepValidation() {
     if (step === 4) return [];
 
     if (step === 5) {
-      // National ID is verified by PIN only — no photo upload (CAPSTONE_DOCS.md
-      // §0.1 D-1 / BR-17).
-      const pin = formData.national_id_pin ?? '';
-      if (!pin) {
-        errors.push('Please enter your National ID PIN.');
-      } else if (!/^\d+$/.test(pin)) {
-        errors.push('Your National ID PIN must contain digits only.');
-      } else if (pin.length !== NATIONAL_ID_PIN_LENGTH) {
-        errors.push(`Your National ID PIN must be exactly ${NATIONAL_ID_PIN_LENGTH} digits.`);
+      // National ID: the card number plus a photo of the front and the back.
+      const cardNumber = formData.national_id_pin ?? '';
+      if (!cardNumber) {
+        errors.push('Please enter your National ID card number.');
+      } else if (!/^\d+$/.test(cardNumber)) {
+        errors.push('Your National ID card number must contain digits only.');
+      } else if (cardNumber.length !== NATIONAL_ID_PIN_LENGTH) {
+        errors.push(`Your National ID card number must be exactly ${NATIONAL_ID_PIN_LENGTH} digits.`);
       }
+
+      if (!files?.file_national_id)      errors.push('Please upload a photo of the FRONT of your National ID.');
+      if (!files?.file_national_id_back) errors.push('Please upload a photo of the BACK of your National ID.');
 
       if (!files?.file_photo)     errors.push('Please upload your 2×2 photo.');
       if (!formData.terms_agreed) errors.push('Please accept the certification checkbox.');

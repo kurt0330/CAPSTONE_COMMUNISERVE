@@ -595,3 +595,39 @@
 @media (max-width: 480px) {
     .pin-input { font-size: 16px; letter-spacing: 1.5px; }
 }
+/* ── Age requirement (Step 1) — shown the moment a birth date is entered ── */
+.age-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 4px 0 14px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--sp-red);
+    border-radius: var(--sp-radius, 8px);
+    background: #fff5f5;
+    color: var(--sp-red);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.age-note {
+    margin: 2px 0 14px;
+    font-size: 12px;
+    color: #777;
+}
+
+/* ── National ID photos (Step 5) — right under the card number ── */
+.id-upload-label {
+    margin: 6px 0 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+}
+
+.id-upload-note {
+    margin: -10px 0 22px;
+    font-size: 12px;
+    color: #777;
+    line-height: 1.5;
+}

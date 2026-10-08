@@ -199,3 +199,26 @@ function friendlyDbError(error, fallback) {
   const looksInternal = /violates|constraint|syntax|relation|function|column|permission/i.test(msg);
   return msg && !looksInternal ? msg : fallback;
 }
+
+/**
+ * The signed-in user has opened My Requests: remember the moment, so the
+ * tab's notification badge only counts activity that happens after it
+ * (see get_request_news_count()). Writes the caller's own users row.
+ */
+export async function markRequestsSeen() {
+  const supabase = createServerClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false };
+
+  const { error } = await supabase
+    .from('users')
+    .update({ requests_seen_at: new Date().toISOString() })
+    .eq('auth_id', user.id);
+
+  if (error) {
+    console.error('[jobActions] markRequestsSeen failed:', error.message);
+    return { success: false };
+  }
+  return { success: true };
+}

@@ -8,13 +8,15 @@
 
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import Icon from '@/components/ui/Icon';
 import Avatar from '@/components/shared/Avatar';
 import LogoutButton from '@/components/shared/LogoutButton';
 import { useJobRealtime } from '@/hooks/useJobRealtime';
+import { markRequestsSeen } from '@/actions/jobActions';
 
 export default function PortalShell({
   portalLabel,
@@ -27,9 +29,12 @@ export default function PortalShell({
   logoutHref,
   avatarUrl,        // the signed-in user's photo, when they have one
   profileHref,      // where the header avatar leads (the user's profile page)
+  newsHref,         // the nav item that carries the notification badge (My Requests)
+  newsCount = 0,    // requests with activity from the other side since it was last opened
   children,
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   // Live job/offer updates on every portal page (requests list, negotiation
   // thread, dashboard counts) — the shell wraps them all.
@@ -41,6 +46,24 @@ export default function PortalShell({
     [href, ...alsoActiveOn].some((p) => pathname === p || pathname.startsWith(`${p}/`))
   )?.href;
   const isActive = (href) => href === activeHref;
+
+  // Notification badge. Opening My Requests is what "reads" the news: the
+  // badge is hidden at once on that page, and the moment is saved so only
+  // later activity counts. If something new arrives while the page is open,
+  // newsCount rises again and this marks it read straight away.
+  const onNewsPage = !!newsHref && (pathname === newsHref || pathname.startsWith(`${newsHref}/`));
+  const badgeCount = onNewsPage ? 0 : newsCount;
+
+  useEffect(() => {
+    if (!onNewsPage || newsCount <= 0) return;
+    let cancelled = false;
+    markRequestsSeen().then((result) => {
+      if (!cancelled && result?.success) router.refresh();
+    });
+    return () => { cancelled = true; };
+  }, [onNewsPage, newsCount, router]);
+
+  const badgeFor = (href) => (href === newsHref && badgeCount > 0 ? <NavBadge count={badgeCount} /> : null);
 
   return (
     <div className="portal-shell">
@@ -59,11 +82,12 @@ export default function PortalShell({
               <Link
                 key={href}
                 href={href}
-                className={`portal-nav-link${isActive(href) ? ' active' : ''}`}
+                className={`portal-nav-link nav-has-badge${isActive(href) ? ' active' : ''}`}
                 aria-current={isActive(href) ? 'page' : undefined}
               >
                 <Icon name={icon} size="sm" />
                 {label}
+                {badgeFor(href)}
               </Link>
             ))}
           </nav>
@@ -102,15 +126,26 @@ export default function PortalShell({
           <Link
             key={href}
             href={href}
-            className={`portal-tab-link${isActive(href) ? ' active' : ''}`}
+            className={`portal-tab-link nav-has-badge${isActive(href) ? ' active' : ''}`}
             aria-current={isActive(href) ? 'page' : undefined}
           >
             <Icon name={icon} size="lg" />
             {shortLabel ?? label}
+            {badgeFor(href)}
           </Link>
         ))}
       </nav>
 
     </div>
+  );
+}
+
+/** Small red count at the upper right of a nav tab. */
+function NavBadge({ count }) {
+  const shown = count > 9 ? '9+' : String(count);
+  return (
+    <span className="nav-badge" aria-label={`${count} new`}>
+      <span aria-hidden="true">{shown}</span>
+    </span>
   );
 }

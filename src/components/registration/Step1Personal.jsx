@@ -6,7 +6,10 @@
 
 import Image from 'next/image';
 import Icon from '@/components/ui/Icon';
+import EmailInput from '@/components/ui/EmailInput';
 import { useAddressSync } from '@/hooks/useAddressSync';
+import { ageFromBirthDate, providerAgeProblem } from '@/lib/validators';
+import { MIN_PROVIDER_AGE } from '@/lib/constants';
 
 export default function Step1Personal({ fields, setFields, children }) {
 
@@ -21,14 +24,14 @@ export default function Step1Personal({ fields, setFields, children }) {
   function handleDOBChange(e) {
     const val = e.target.value;
     setFields((prev) => ({ ...prev, date_of_birth: val }));
-    if (!val) return;
-    const dob   = new Date(val);
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const m = today.getMonth() - dob.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-    setFields((prev) => ({ ...prev, age: age >= 0 ? String(age) : '' }));
+    const age = ageFromBirthDate(val);
+    setFields((prev) => ({ ...prev, age: age === null ? '' : String(age) }));
   }
+
+  // Shown as soon as a birth date is entered, so an applicant who is too
+  // young finds out here and not after filling in the whole form.
+  const ageProblem = providerAgeProblem(fields.date_of_birth);
+  const todayIso = new Date().toLocaleDateString('en-CA');   // YYYY-MM-DD, local
 
   // ── Address sync (mirrors form1.js) ──────────────────────────
   const { handleSameAddress, syncOnChange } = useAddressSync(
@@ -153,10 +156,14 @@ export default function Step1Personal({ fields, setFields, children }) {
             DATE OF BIRTH <small>(mm/dd/yyyy)</small> <span className="req">*</span>
           </label>
           <input
+            id="date_of_birth"
             type="date"
             className="table-input"
+            max={todayIso}
             value={fields.date_of_birth}
             onChange={handleDOBChange}
+            aria-invalid={!!ageProblem}
+            aria-describedby="dob-note"
           />
         </div>
         <div className="field-group flex-1">
@@ -171,6 +178,18 @@ export default function Step1Personal({ fields, setFields, children }) {
           />
         </div>
       </div>
+
+      {/* Age requirement — live, right under the birth date */}
+      {ageProblem ? (
+        <div className="age-alert" id="dob-note" role="alert">
+          <Icon name="warning" size="sm" />
+          <span>{ageProblem}</span>
+        </div>
+      ) : (
+        <p className="age-note" id="dob-note">
+          You must be at least {MIN_PROVIDER_AGE} years old to register as a service provider.
+        </p>
+      )}
 
       {/* Sex + Present Address */}
       <div className="input-row">
@@ -280,12 +299,11 @@ export default function Step1Personal({ fields, setFields, children }) {
             EMAIL ADDRESS <span className="req">*</span>
           </label>
           {/* users.email VARCHAR(150) */}
-          <input
-            type="email"
+          <EmailInput
+            id="provider_email"
             className="table-input"
-            placeholder="yourname@email.com"
             value={fields.email}
-            onChange={set('email')}
+            onValueChange={(v) => setFields((prev) => ({ ...prev, email: v }))}
           />
         </div>
       </div>

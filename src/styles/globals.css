@@ -173,3 +173,50 @@ body {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+/* ── Email shortcut (EmailInput): hint + one-tap domain choices ─────────────
+   Used on sign-in and on both registration forms, so it lives here. */
+.email-assist {
+  min-height: 0;
+}
+
+.email-assist-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #666;
+}
+
+.email-assist-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.email-assist-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--sp-blue, #0504AA);
+  border-radius: 999px;
+  background: var(--sp-blue-tint, #eef0ff);
+  color: var(--sp-blue, #0504AA);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.email-assist-chip:hover {
+  background: var(--sp-blue, #0504AA);
+  color: #fff;
+}
+
+.email-assist-chip:focus-visible {
+  outline: 2px solid var(--sp-blue, #0504AA);
+  outline-offset: 2px;
+}

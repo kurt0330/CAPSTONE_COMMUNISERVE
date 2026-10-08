@@ -14,6 +14,7 @@ import Step3Trade        from '@/components/registration/Step3Trade';
 import Step4Assessment   from '@/components/registration/Step4Assessment';
 import Step5Files        from '@/components/registration/Step5Files';
 import { useStepValidation } from '@/hooks/useStepValidation';
+import { completeEmail } from '@/lib/email';
 
 // ── Initial field state — every key maps 1-to-1 with registerProvider.js ──
 const INITIAL_FIELDS = {
@@ -66,15 +67,21 @@ const INITIAL_FIELDS = {
   assessment_started_at: null,
   assessment_skipped:    false,
   // step 5
-  // provider_identity.national_id_pin — PIN only, no ID photo (§0.1 D-1 / BR-17)
+  // provider_identity.national_id_pin — the National ID card number (BR-17)
   national_id_pin:      '',
   terms_agreed:         false,
 };
 
 const INITIAL_FILES = {
-  file_photo:       null,
-  file_certificate: null,
+  file_national_id:      null,   // National ID — front
+  file_national_id_back: null,   // National ID — back
+  file_photo:            null,
+  file_certificate:      null,
 };
+
+// The whole submission travels in one request. Vercel caps a request body at
+// about 4.5 MB, so stop here with a clear message instead of a network error.
+const MAX_TOTAL_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 // ── Full linear navigation map including Step 4 ──────────────────────────────
 const STEP_SEQUENCE = [1, 2, 3, 4, 5];
@@ -161,6 +168,12 @@ export default function ProviderRegistrationPage() {
       return;
     }
 
+    const totalBytes = Object.values(files).reduce((sum, f) => sum + (f instanceof File ? f.size : 0), 0);
+    if (totalBytes > MAX_TOTAL_UPLOAD_BYTES) {
+      showToast('Your files are too large to send together (over 4 MB). Please choose a smaller certificate file.');
+      return;
+    }
+
     setSubmitting(true);
     setSubmitResult(null);
 
@@ -169,7 +182,9 @@ export default function ProviderRegistrationPage() {
       const fd = new FormData();
 
       Object.entries(fields).forEach(([k, v]) => {
-        if (k === 'assessment_answers') {
+        if (k === 'email') {
+          fd.append(k, completeEmail(v));   // "juan" → "juan@gmail.com"
+        } else if (k === 'assessment_answers') {
           // Serialize the nested quiz dictionary cleanly into a string payload
           fd.append(k, JSON.stringify(v));
         } else {
@@ -416,7 +431,10 @@ function ErrorDetailPanel({ errors = [] }) {
   return (
     <div
       style={{
-        width: 850,
+        // Was a fixed 850px, which pushed the page wider than a phone screen
+        // after any failed submit and left the Submit button untappable.
+        width: 'min(850px, calc(100% - 32px))',
+        boxSizing: 'border-box',
         margin: '16px auto 0',
         padding: '16px 20px',
         background: '#fff5f5',
