@@ -3191,6 +3191,110 @@ html:has(.portal-shell) {
   --cs-bg: #F4F7FF;
 }
 
-.portal-shell--provider {
-  --cs-bg: #FFF8E6;
+/* Provider portal palette — a warm neutral set built from four swatches:
+     #F8F7F4 off-white · #EDE7E0 linen · #D9CFC6 taupe · #C7B299 sand
+   plus an espresso brown derived from them for text and actions, since none
+   of the four is dark enough to read on. Green and red keep their meaning.
+   body:has() carries the palette to dialogs rendered outside the shell. */
+.portal-shell--provider,
+body:has(.portal-shell--provider) {
+  --cs-primary:        #6B5440;
+  --cs-primary-hover:  #54412F;
+  --cs-primary-tint:   #EDE7E0;
+  --cs-primary-ring:   rgba(107, 84, 64, 0.22);
+
+  --cs-bg:             #EDE7E0;
+  --cs-surface:        #FBFAF8;
+  --cs-surface-muted:  #F1ECE6;
+  --cs-border:         #E0D7CD;
+  --cs-border-strong:  #D0C4B8;
+
+  --cs-text:           #2E2620;
+  --cs-text-muted:     #6F6257;
+  --cs-text-soft:      #988B7E;
+
+  --cs-warning-tint:   #F3E7D3;
+  --cs-star:           #B5895A;
+
+  --cs-shadow-sm:      0 1px 2px rgba(70, 52, 36, 0.06);
+  --cs-shadow:         0 1px 2px rgba(70, 52, 36, 0.05), 0 6px 20px rgba(70, 52, 36, 0.08);
+  --cs-shadow-lg:      0 12px 32px rgba(70, 52, 36, 0.18);
+}
+
+/* Provider portal chrome — header, navigation and accents. Espresso marks
+   where you are and what you can press; sand marks ratings and "needs you". */
+body:has(.portal-shell--provider) {
+  background-color: #EDE7E0;
+}
+
+.portal-shell--provider .portal-header {
+  background: rgba(248, 247, 244, 0.92);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom-color: #D9CFC6;
+  box-shadow: 0 6px 18px -12px rgba(70, 52, 36, 0.35);
+}
+
+.portal-shell--provider .portal-badge {
+  background: #D9CFC6;
+  color: #4A3B2E;
+}
+
+.portal-shell--provider .portal-nav-link:hover {
+  background: #EDE7E0;
+  color: var(--cs-primary);
+}
+
+.portal-shell--provider .portal-nav-link.active {
+  background: var(--cs-primary);
+  color: #FFFFFF;
+  box-shadow: 0 6px 14px -8px rgba(70, 52, 36, 0.7);
+}
+
+.portal-shell--provider .portal-chip {
+  background: #EDE7E0;
+  color: #4A3B2E;
+}
+
+.portal-shell--provider .portal-tabbar {
+  background: rgba(248, 247, 244, 0.96);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-top-color: #D9CFC6;
+  box-shadow: 0 -6px 18px -12px rgba(70, 52, 36, 0.35);
+}
+
+.portal-shell--provider .portal-tab-link {
+  position: relative;
+  color: #8A7C6E;
+}
+
+.portal-shell--provider .portal-tab-link.active {
+  color: var(--cs-primary);
+}
+
+.portal-shell--provider .portal-tab-link.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 32px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: #C7B299;
+  transform: translateX(-50%);
+}
+
+.portal-shell--provider .metric-card .icon {
+  color: #A08462;
+}
+
+.portal-shell--provider .turn-badge {
+  background: #C7B299;
+  color: #2E2620;
+}
+
+.portal-shell--provider .occupied-pill {
+  background: #EDE7E0;
+  color: #5C4A3A;
 }
