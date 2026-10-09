@@ -3184,3 +3184,13 @@ html:has(.portal-shell) {
 .dash-columns--flush {
   margin-top: 0;
 }
+
+/* Page background per portal — the same tints the landing page uses for its
+   two sides: light blue for residents, warm cream for service providers. */
+.portal-shell--customer {
+  --cs-bg: #F4F7FF;
+}
+
+.portal-shell--provider {
+  --cs-bg: #FFF8E6;
+}

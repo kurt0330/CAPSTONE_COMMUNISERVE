@@ -56,19 +56,7 @@ export default async function CustomerDashboardPage() {
     <div className="app-page">
 
       {/* Primary actions */}
-      <div className="dash-hero">
-        <h1 className="visually-hidden">Dashboard</h1>
-        <div className="form-actions">
-          <Link href="/customer/search" className="btn-primary-app">
-            <Icon name="search" size="sm" />
-            Find a Provider
-          </Link>
-          <Link href="/customer/profile" className="btn-ghost-app">
-            <Icon name="user" size="sm" />
-            My Profile
-          </Link>
-        </div>
-      </div>
+      <h1 className="visually-hidden">Dashboard</h1>
 
       {/* Metrics */}
       <div className="metric-grid">

@@ -31,6 +31,7 @@ export default function PortalShell({
   profileHref,      // where the header avatar leads (the user's profile page)
   newsHref,         // the nav item that carries the notification badge (My Requests)
   newsCount = 0,    // requests with activity from the other side since it was last opened
+  theme,            // 'customer' | 'provider' — page background tint, matching the landing page
   children,
 }) {
   const pathname = usePathname();
@@ -66,7 +67,7 @@ export default function PortalShell({
   const badgeFor = (href) => (href === newsHref && badgeCount > 0 ? <NavBadge count={badgeCount} /> : null);
 
   return (
-    <div className="portal-shell">
+    <div className={`portal-shell${theme ? ` portal-shell--${theme}` : ''}`}>
 
       <header className="portal-header">
         <div className="portal-header-inner">

@@ -15,7 +15,7 @@
 
 'use client';
 
-import { completeEmail, needsEmailDomain, DEFAULT_EMAIL_DOMAIN, EMAIL_DOMAIN_CHOICES } from '@/lib/email';
+import { completeEmail, needsEmailDomain, EMAIL_DOMAIN_CHOICES } from '@/lib/email';
 
 export default function EmailInput({
   id,
@@ -23,10 +23,9 @@ export default function EmailInput({
   onValueChange,
   className,
   style,
-  placeholder = 'yourname',
+  placeholder = 'yourname@gmail.com',
   required = false,
   disabled = false,
-  hint = true,
 }) {
   const typed = String(value ?? '');
   const showChoices = needsEmailDomain(typed);
@@ -50,11 +49,11 @@ export default function EmailInput({
         disabled={disabled}
         onChange={(e) => onValueChange(e.target.value)}
         onBlur={() => { if (needsEmailDomain(typed)) onValueChange(completeEmail(typed)); }}
-        aria-describedby={hint && id ? `${id}-assist` : undefined}
+        aria-describedby={showChoices && id ? `${id}-assist` : undefined}
       />
 
       <div className="email-assist" id={id ? `${id}-assist` : undefined}>
-        {showChoices ? (
+        {showChoices && (
           <div className="email-assist-choices">
             {EMAIL_DOMAIN_CHOICES.map((domain) => (
               <button
@@ -70,11 +69,7 @@ export default function EmailInput({
               </button>
             ))}
           </div>
-        ) : hint && !typed ? (
-          <p className="email-assist-hint">
-            Type just your email name — <strong>@{DEFAULT_EMAIL_DOMAIN}</strong> is added for you.
-          </p>
-        ) : null}
+        )}
       </div>
     </>
   );

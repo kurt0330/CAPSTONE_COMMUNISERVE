@@ -78,16 +78,6 @@ export default async function ProviderDashboardPage() {
             {provider?.admin_status} · {provider?.trade_category}
           </span>
         </div>
-        <div className="form-actions">
-          <Link href="/provider/requests" className="btn-ghost-app">
-            <Icon name="clipboard" size="sm" />
-            My Requests
-          </Link>
-          <Link href="/provider/portfolio" className="btn-ghost-app">
-            <Icon name="briefcase" size="sm" />
-            My Portfolio
-          </Link>
-        </div>
       </div>
 
       {/* Metrics */}

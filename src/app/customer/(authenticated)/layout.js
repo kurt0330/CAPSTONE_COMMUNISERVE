@@ -63,6 +63,7 @@ export default async function CustomerAuthLayout({ children }) {
   return (
     <PortalShell
       portalLabel="Resident Portal"
+      theme="customer"
       homeHref="/customer/dashboard"
       navItems={NAV_ITEMS}
       userName={publicUser.full_name}

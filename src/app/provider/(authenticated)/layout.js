@@ -70,6 +70,7 @@ export default async function AuthenticatedProviderLayout({ children }) {
   return (
     <PortalShell
       portalLabel="Provider Portal"
+      theme="provider"
       homeHref="/provider/dashboard"
       navItems={NAV_ITEMS}
       userName={publicUser.full_name}

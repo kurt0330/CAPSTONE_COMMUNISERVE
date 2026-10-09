@@ -173,17 +173,10 @@ body {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
-/* ── Email shortcut (EmailInput): hint + one-tap domain choices ─────────────
+/* ── Email shortcut (EmailInput): one-tap domain choices ─────────────
    Used on sign-in and on both registration forms, so it lives here. */
 .email-assist {
   min-height: 0;
-}
-
-.email-assist-hint {
-  margin: 6px 0 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: #666;
 }
 
 .email-assist-choices {
