@@ -122,7 +122,7 @@ function UnifiedAuthContent() {
         .auth-page {
           --auth-blue: #0504AA;
           --auth-ink: #14143a;
-          --auth-muted: #5d6280;
+          --auth-muted: #3f4466;
           --auth-line: rgba(5, 4, 170, 0.16);
           --auth-ease: cubic-bezier(0.65, 0, 0.35, 1);
           --auth-dur: 0.95s;
@@ -137,37 +137,24 @@ function UnifiedAuthContent() {
           overflow: hidden;
           font-family: system-ui, -apple-system, sans-serif;
           color: var(--auth-ink);
-          background:
-            radial-gradient(60% 55% at 10% 8%, rgba(5, 4, 170, 0.16), transparent 70%),
-            radial-gradient(45% 45% at 92% 94%, rgba(184, 123, 46, 0.16), transparent 70%),
-            radial-gradient(40% 40% at 88% 6%, rgba(59, 59, 201, 0.14), transparent 70%),
-            #eef1ff;
+          background: #1b2a6b;
         }
 
-        /* Soft colour shapes behind the card — they are what the glass blurs.
-           Blue and warm brown, the landing page's resident and provider sides. */
-        .auth-orb {
-          position: absolute;
-          border-radius: 50%;
+        /* Photo of the Anini-y church behind everything, fixed so it stays put
+           while a long form scrolls. A blue wash keeps it on theme and keeps
+           the glass card readable. */
+        .auth-page::before,
+        .auth-page::after {
+          content: '';
+          position: fixed;
+          inset: 0;
           pointer-events: none;
         }
-        .auth-orb--a {
-          width: 420px; height: 420px;
-          left: calc(50% - 640px); top: calc(50% - 480px);
-          background: radial-gradient(circle at 35% 35%, #6f6dff, #0504AA 72%);
-          opacity: 0.5;
+        .auth-page::before {
+          background: url('/images/login-bg.jpg') center / cover no-repeat;
         }
-        .auth-orb--b {
-          width: 300px; height: 300px;
-          left: calc(50% + 310px); top: calc(50% + 180px);
-          background: radial-gradient(circle at 35% 35%, #ecc98f, #a9742c 75%);
-          opacity: 0.55;
-        }
-        .auth-orb--c {
-          width: 170px; height: 170px;
-          left: calc(50% - 570px); top: calc(50% + 210px);
-          background: radial-gradient(circle at 35% 35%, #f3dcae, #c08a3e 75%);
-          opacity: 0.5;
+        .auth-page::after {
+          background: linear-gradient(170deg, rgba(5, 4, 170, 0.10) 0%, rgba(12, 14, 60, 0.34) 100%);
         }
 
         /* ── The glass card ── */
@@ -180,18 +167,18 @@ function UnifiedAuthContent() {
           min-height: 760px;
           border-radius: 24px;
           container-type: inline-size;
-          background: rgba(255, 255, 255, 0.9);
-          border: 1px solid rgba(255, 255, 255, 0.8);
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(255, 255, 255, 0.7);
           box-shadow:
-            0 30px 60px -22px rgba(5, 4, 170, 0.3),
-            0 8px 24px rgba(20, 20, 58, 0.08),
+            0 34px 70px -24px rgba(6, 8, 40, 0.65),
+            0 10px 28px rgba(6, 8, 40, 0.22),
             inset 0 1px 0 rgba(255, 255, 255, 0.85);
         }
         @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
           .auth-container {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.52));
-            -webkit-backdrop-filter: blur(26px) saturate(160%);
-            backdrop-filter: blur(26px) saturate(160%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.40));
+            -webkit-backdrop-filter: blur(12px) saturate(140%);
+            backdrop-filter: blur(12px) saturate(140%);
           }
         }
 
@@ -300,7 +287,7 @@ function UnifiedAuthContent() {
         }
         .auth-form { display: flex; flex-direction: column; gap: 16px; }
         .auth-field { display: flex; flex-direction: column; gap: 6px; }
-        .auth-label { font-size: 13px; font-weight: 700; color: #3a3d57; }
+        .auth-label { font-size: 13px; font-weight: 700; color: #23264a; }
         .auth-pwd { position: relative; }
 
         /* Glass inputs — shared by the sign-in fields and the sign-up form */
@@ -310,7 +297,7 @@ function UnifiedAuthContent() {
           padding: 12px 14px;
           border: 1px solid var(--auth-line);
           border-radius: 10px;
-          background: rgba(255, 255, 255, 0.66);
+          background: rgba(255, 255, 255, 0.82);
           color: var(--auth-ink);
           font-size: 16px;
           font-family: inherit;
@@ -556,17 +543,11 @@ function UnifiedAuthContent() {
 
         /* ── Phones: one full-width form at a time, no sliding panel ── */
         @media (max-width: 768px) {
-          .auth-page { padding: 0; align-items: stretch; }
-          .auth-orb--a { left: -170px; top: -150px; width: 340px; height: 340px; }
-          .auth-orb--b { left: auto; right: -120px; top: auto; bottom: -90px; width: 260px; height: 260px; }
-          .auth-orb--c { left: -60px; top: 58%; width: 140px; height: 140px; }
+          .auth-page { padding: 20px 14px; }
           .auth-container {
-            max-width: none;
-            min-height: 100vh;
-            min-height: 100dvh;
-            border: 0;
-            border-radius: 0;
-            box-shadow: none;
+            max-width: 480px;
+            min-height: 0;
+            border-radius: 22px;
           }
           .overlay-container { display: none; }
           .auth-container .form-container,
@@ -574,9 +555,8 @@ function UnifiedAuthContent() {
             position: relative;
             width: 100%;
             height: auto;
-            min-height: 100vh;
-            min-height: 100dvh;
-            padding: 16px 20px 28px;
+            min-height: 0;
+            padding: 14px 20px 26px;
             overflow: visible;
             opacity: 1;
             visibility: visible;
@@ -597,10 +577,6 @@ function UnifiedAuthContent() {
           .auth-container .form-container { animation: none !important; }
         }
       `}} />
-
-      <span className="auth-orb auth-orb--a" aria-hidden="true" />
-      <span className="auth-orb auth-orb--b" aria-hidden="true" />
-      <span className="auth-orb auth-orb--c" aria-hidden="true" />
 
       <div className={`auth-container ${isRightPanelActive ? 'right-panel-active' : ''}`}>
 
