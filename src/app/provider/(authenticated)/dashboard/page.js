@@ -38,8 +38,7 @@ export default async function ProviderDashboardPage() {
 
   if (!me) redirect('/auth/login');
 
-  const [{ data: provider }, { data: jobRows }, { data: completedRows }, { data: avatarRows }] = await Promise.all([
-    supabase.from('providers').select('trade_category, admin_status').eq('user_id', me.user_id).single(),
+  const [{ data: jobRows }, { data: completedRows }, { data: avatarRows }] = await Promise.all([
     supabase.rpc('get_provider_jobs'),
     supabase.rpc('get_provider_completed_jobs', { p_limit: RECENT_LIMIT }),
     supabase.rpc('get_job_avatars'),
@@ -69,16 +68,7 @@ export default async function ProviderDashboardPage() {
   return (
     <div className="app-page">
 
-      {/* Greeting + status */}
-      <div className="dash-hero">
-        <div>
-          <h1 className="visually-hidden">Dashboard</h1>
-          <span className="verified-badge">
-            <span className="status-dot status-dot--on" />
-            {provider?.admin_status} · {provider?.trade_category}
-          </span>
-        </div>
-      </div>
+      <h1 className="visually-hidden">Dashboard</h1>
 
       {/* Metrics */}
       <div className="metric-grid">

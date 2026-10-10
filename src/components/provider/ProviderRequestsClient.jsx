@@ -8,7 +8,6 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 import JobRequestCard from '@/components/provider/JobRequestCard';
-import ToggleSwitch   from '@/components/shared/ToggleSwitch';
 import EmptyState     from '@/components/shared/EmptyState';
 import Icon           from '@/components/ui/Icon';
 
@@ -21,7 +20,6 @@ export default function ProviderRequestsClient({ requests = [] }) {
   const [isPending, startTransition] = useTransition();
 
   const [filter,    setFilter]    = useState('All');
-  const [available, setAvailable] = useState(true);
   const [busyId,    setBusyId]    = useState(null);
   const [error,     setError]     = useState('');
 
@@ -66,21 +64,6 @@ export default function ProviderRequestsClient({ requests = [] }) {
             {pendingCount} pending {pendingCount === 1 ? 'request needs' : 'requests need'} your response.
           </p>
         </div>
-      </div>
-
-      {/* Availability is UI-only: the schema has no availability column yet
-          (CAPSTONE_DOCS.md gap G-1), so this does not persist. */}
-      <div className="toggle-row">
-        <div>
-          <p className="toggle-row-label">
-            <span className={`status-dot${available ? ' status-dot--on' : ''}`} />
-            {available ? 'Available for work' : 'Not accepting requests'}
-          </p>
-          <p className="toggle-row-hint">
-            Not saved yet — needs an availability field in the database.
-          </p>
-        </div>
-        <ToggleSwitch on={available} onToggle={setAvailable} label="Toggle availability" />
       </div>
 
       {error && (
